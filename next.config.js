@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["your-backend-domain.com"], // Add your image domain here
+    domains: [
+      "your-backend-domain.com",
+      "admin.sixdesign.ca", // Added your domain
+    ],
   },
 };
 

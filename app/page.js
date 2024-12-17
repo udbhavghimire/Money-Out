@@ -13,6 +13,10 @@ import {
   Camera,
   X,
   CalendarIcon,
+  Menu,
+  Filter,
+  Sliders,
+  SlidersHorizontal,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "@/lib/axios";
@@ -175,11 +179,23 @@ export default function ExpensesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-sm mx-auto">
+    <div className="min-h-screen">
+      {/* Background Container */}
+      <div
+        className="fixed inset-0 z-0 md:w-[430px] md:left-1/2 md:-translate-x-1/2"
+        style={{
+          backgroundImage: 'url("/bg.png")',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+
+      {/* Content Container */}
+      <div className="relative z-10 max-w-sm mx-auto">
         {/* Money Out Header */}
-        <div className="p-5 bg-white">
-          <div className="flex justify-center">
+        <div className="p-5">
+          <div className="flex justify-start">
             <Image
               src="/money-out-logo.png"
               alt="Money Out"
@@ -191,51 +207,57 @@ export default function ExpensesPage() {
         </div>
 
         {/* Stats Section */}
-        <div className="sticky top-0 bg-white z-10">
-          <div className="bg-white p-3">
-            <div className="flex justify-between items-center bg-[#FFFBEB] rounded-xl p-2.5 shadow-sm mx-4">
-              <div className="text-center px-1">
-                <p className="text-[12px] uppercase text-gray-500 mb-0.5">
-                  THIS WEEK
-                </p>
-                <p className="font-semibold text-[12px]">
-                  ${summary.week_total?.toFixed(2) || "200"}
-                </p>
+        <div className="sticky top-0 z-10">
+          <div className="p-3">
+            <div className="flex justify-start items-center">
+              <div className="flex items-center gap-6 bg-[#fff6d3] shadow-sm rounded-3xl pl-3 pr-12 py-3 ml-4">
+                <div className="text-center">
+                  <p className="text-[10px] font-medium text-gray-900">$200</p>
+                  <p className="text-[8px] uppercase font-bold text-black mt-0.5">
+                    THIS WEEK
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] font-medium text-gray-900">$400</p>
+                  <p className="text-[8px] uppercase font-bold text-black mt-0.5">
+                    THIS MONTH
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] font-medium text-gray-900">$800</p>
+                  <p className="text-[8px] uppercase font-bold text-black mt-0.5">
+                    THIS YEAR
+                  </p>
+                </div>
               </div>
-              <div className="text-center px-1">
-                <p className="text-[12px] uppercase text-gray-500 mb-0.5">
-                  THIS MONTH
-                </p>
-                <p className="font-semibold text-[12px]">
-                  ${summary.month_total?.toFixed(2) || "400"}
-                </p>
+
+              {/* Filter Button */}
+              <div className="flex items-center mx-5">
+                <button className="flex flex-col items-center">
+                  <SlidersHorizontal
+                    className="h-4 w-4 text-gray-900"
+                    strokeWidth={2.5}
+                  />
+                  <span className="text-[8px] uppercase font-medium text-gray-900 mt-0.5">
+                    FILTER
+                  </span>
+                </button>
               </div>
-              <div className="text-center px-1">
-                <p className="text-[12px] uppercase text-gray-500 mb-0.5">
-                  THIS YEAR
-                </p>
-                <p className="font-semibold text-[12px]">
-                  ${summary.year_total?.toFixed(2) || "800"}
-                </p>
-              </div>
-              <button className="p-1.5 hover:bg-gray-100 rounded-full">
-                <Settings className="h-4 w-4 text-gray-400" />
-              </button>
             </div>
           </div>
         </div>
 
         {/* Search Section */}
-        <div className="p-5 bg-white border-t border-gray-100">
+        <div className="p-5">
           <div className="mx-4">
             <h2 className="text-blue-600 text-base font-semibold mb-2">
               EXPENSE HISTORY
             </h2>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
               <Input
                 placeholder="SEARCH THE RECEIPT"
-                className="pl-10 bg-gray-100 border-none rounded-3xl text-sm h-9"
+                className="pl-10 bg-transparent border border-2 border-gray-300/50 rounded-3xl text-xs h-9 placeholder:text-gray-500 w-60"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -244,7 +266,7 @@ export default function ExpensesPage() {
         </div>
 
         {/* Expense List */}
-        <div className="bg-white px-8 pb-20">
+        <div className="px-8 pb-20">
           <ExpenseList
             expenses={filteredExpenses}
             categories={categories}
@@ -256,7 +278,7 @@ export default function ExpensesPage() {
         </div>
 
         {/* Upload Receipt Button */}
-        <div className="sticky bottom-0 left-0 right-0 flex items-center justify-center -mx-[35px] mt-auto">
+        <div className="sticky bottom-0 left-0 right-0 flex items-center justify-center -mx-[25px] mt-auto">
           <Image
             src="/wave.png"
             alt="Wave Background"

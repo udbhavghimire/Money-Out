@@ -166,7 +166,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
                 <div className="w-12 h-1 bg-gray-200 rounded-full"></div>
               </div>
 
-              {/* Header */}
+              {/* Header - Using Notes as Title */}
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-900">
                   {selectedExpense.description || "Expense Details"}
@@ -205,26 +205,14 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
 
               {/* View Receipt Button */}
               {selectedExpense.receipt && (
-                <div className="mt-6 mb-2">
-                  <div className="relative w-full h-[200px] rounded-lg overflow-hidden bg-gray-50">
-                    <Image
-                      src={selectedExpense.receipt}
-                      alt="Receipt thumbnail"
-                      fill
-                      sizes="(max-width: 768px) 100vw, 400px"
-                      className="object-cover"
-                      priority
-                    />
-                  </div>
-                  <div className="mt-8 flex justify-center">
-                    <Button
-                      variant="outline"
-                      className="text-blue-600 hover:text-blue-700"
-                      onClick={() => setShowFullImage(true)}
-                    >
-                      View Receipt
-                    </Button>
-                  </div>
+                <div className="mt-8 flex justify-center">
+                  <Button
+                    variant="outline"
+                    className="text-blue-600 hover:text-blue-700"
+                    onClick={() => setShowFullImage(true)}
+                  >
+                    View Receipt
+                  </Button>
                 </div>
               )}
             </div>
@@ -250,7 +238,6 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
                   priority
                   sizes="(max-width: 768px) 100vw, 80vw"
                   className="object-contain"
-                  loading="eager"
                   onClick={e => e.stopPropagation()}
                 />
               </div>
