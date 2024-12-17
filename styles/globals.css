@@ -1,0 +1,18 @@
+.DialogContent {
+    max-height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.DialogContent::-webkit-scrollbar {
+    width: 4px;
+}
+
+.DialogContent::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.DialogContent::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 2px;
+}
