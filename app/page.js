@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { isAuthenticated } from "@/lib/auth";
 import { CreateExpenseDialog } from "@/components/expenses/create-expense-dialog";
 
 import { Button } from "@/components/ui/button";
@@ -36,6 +38,7 @@ import Image from "next/image";
 import { CameraCapture } from "@/components/ui/camera";
 
 export default function ExpensesPage() {
+  const router = useRouter();
   const [expenses, setExpenses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +65,13 @@ export default function ExpensesPage() {
   const [showReceiptDialog, setShowReceiptDialog] = useState(false);
   const [showExpenseDialog, setShowExpenseDialog] = useState(false);
   const [showCameraView, setShowCameraView] = useState(false);
+
+  useEffect(() => {
+    // Redirect to signin if not authenticated
+    if (!isAuthenticated()) {
+      router.push("/signin");
+    }
+  }, [router]);
 
   useEffect(() => {
     fetchExpenses();
