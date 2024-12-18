@@ -15,6 +15,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1"
+        />
+      </head>
       <body className="relative min-h-screen bg-white">
         <div className="relative z-10">
           <NextTopLoader color="red" height={3} />

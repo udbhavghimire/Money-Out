@@ -166,10 +166,10 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
                 <div className="w-12 h-1 bg-gray-200 rounded-full"></div>
               </div>
 
-              {/* Header - Using Notes as Title */}
+              {/* Header with close button */}
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-900">
-                  {selectedExpense.description || "Expense Details"}
+                  Expense Details
                 </h3>
                 <button
                   onClick={() => setSelectedExpense(null)}
@@ -179,38 +179,52 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
                 </button>
               </div>
 
-              {/* Details Grid */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-gray-600">Amount</span>
-                  <span className="text-xl font-semibold text-gray-900">
+              {/* Expense Details in List Style */}
+              <div className="py-1.5 flex justify-between items-start border-b border-gray-100">
+                <div className="flex items-start gap-2">
+                  <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
+                    <svg 
+                      viewBox="0 0 24 24" 
+                      className="h-4 w-4 text-gray-400"
+                      fill="none" 
+                      stroke="currentColor"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={1.5}
+                        d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900 leading-none">
+                      {selectedExpense.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-0.5 leading-none">
+                      {format(new Date(selectedExpense.expense_date), "MMM dd, yyyy")}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-semibold leading-none">
                     ${formatAmount(selectedExpense.amount)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-gray-600">Date</span>
-                  <span className="text-gray-900">
-                    {format(new Date(selectedExpense.expense_date), "MMMM d, yyyy")}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-gray-600">Category</span>
-                  <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">
-                    {selectedExpense.category_details?.name || "Uncategorized"}
-                  </span>
+                  </p>
+                  <p className="text-xs text-gray-500 uppercase mt-0.5 leading-none">
+                    {selectedExpense.category_details?.name || "OFFICE / ADMIN"}
+                  </p>
                 </div>
               </div>
 
-              {/* View Receipt Button */}
+              {/* View Receipt Button - Centered at bottom */}
               {selectedExpense.receipt && (
                 <div className="mt-8 flex justify-center">
                   <Button
                     variant="outline"
-                    className="text-blue-600 hover:text-blue-700"
+                    className="text-blue-600 hover:text-blue-700 w-full max-w-[200px]"
                     onClick={() => setShowFullImage(true)}
                   >
+                    <Receipt className="w-4 h-4 mr-2" />
                     View Receipt
                   </Button>
                 </div>

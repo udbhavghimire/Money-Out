@@ -36,6 +36,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { WaveBackground } from "@/components/ui/wave-background";
 import Image from "next/image";
 import { CameraCapture } from "@/components/ui/camera";
+import { FilterDialog } from "@/components/expenses/filter-dialog";
 
 export default function ExpensesPage() {
   const router = useRouter();
@@ -65,6 +66,10 @@ export default function ExpensesPage() {
   const [showReceiptDialog, setShowReceiptDialog] = useState(false);
   const [showExpenseDialog, setShowExpenseDialog] = useState(false);
   const [showCameraView, setShowCameraView] = useState(false);
+  const [showFilterDialog, setShowFilterDialog] = useState(false);
+  const [activeFilters, setActiveFilters] = useState({});
+  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [showFullImage, setShowFullImage] = useState(false);
 
   useEffect(() => {
     // Redirect to signin if not authenticated
@@ -114,9 +119,46 @@ export default function ExpensesPage() {
     }
   };
 
-  const filteredExpenses = expenses.filter((expense) =>
-    expense.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleFilter = (filters) => {
+    setActiveFilters(filters);
+  };
+
+  const filteredExpenses = expenses.filter((expense) => {
+    // Text search filter
+    const matchesSearch = expense.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
+    // Category filter
+    const matchesCategory =
+      !activeFilters.category ||
+      expense.category.toString() === activeFilters.category;
+
+    // Date range filter
+    const matchesDateRange = () => {
+      if (!activeFilters.dateRange?.from && !activeFilters.dateRange?.to)
+        return true;
+
+      const expenseDate = new Date(expense.expense_date);
+      const fromDate = activeFilters.dateRange.from
+        ? new Date(activeFilters.dateRange.from)
+        : null;
+      const toDate = activeFilters.dateRange.to
+        ? new Date(activeFilters.dateRange.to)
+        : null;
+
+      if (fromDate && toDate) {
+        return expenseDate >= fromDate && expenseDate <= toDate;
+      } else if (fromDate) {
+        return expenseDate >= fromDate;
+      } else if (toDate) {
+        return expenseDate <= toDate;
+      }
+      return true;
+    };
+
+    return matchesSearch && matchesCategory && matchesDateRange();
+  });
 
   const handleFileChange = (e) => {
     if (e.target.files?.[0]) {
@@ -188,11 +230,15 @@ export default function ExpensesPage() {
     setShowExpenseDialog(true);
   };
 
+  const formatAmount = (amount) => {
+    return `$${amount.toFixed(2)}`;
+  };
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       {/* Background Container */}
       <div
-        className="fixed inset-0 z-0 md:w-[430px] md:left-1/2 md:-translate-x-1/2"
+        className="fixed inset-0 z-0 w-full md:w-[430px] md:left-1/2 md:-translate-x-1/2"
         style={{
           backgroundImage: 'url("/bg.png")',
           backgroundSize: "cover",
@@ -202,7 +248,7 @@ export default function ExpensesPage() {
       />
 
       {/* Content Container */}
-      <div className="relative z-10 max-w-sm mx-auto">
+      <div className="relative z-10 w-full max-w-[430px] mx-auto px-4">
         {/* Money Out Header */}
         <div className="p-5">
           <div className="flex justify-start">
@@ -243,7 +289,10 @@ export default function ExpensesPage() {
 
               {/* Filter Button */}
               <div className="flex items-center mx-5">
-                <button className="flex flex-col items-center">
+                <button
+                  className="flex flex-col items-center"
+                  onClick={() => setShowFilterDialog(true)}
+                >
                   <SlidersHorizontal
                     className="h-4 w-4 text-gray-900"
                     strokeWidth={2.5}
@@ -267,7 +316,8 @@ export default function ExpensesPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
               <Input
                 placeholder="SEARCH THE RECEIPT"
-                className="pl-10 bg-transparent border border-2 border-gray-300/50 rounded-3xl text-xs h-9 placeholder:text-gray-500 w-60"
+                className="pl-10 bg-transparent border border-2 border-gray-300/50 rounded-3xl h-9 placeholder:text-gray-500 w-60"
+                style={{ fontSize: "12px" }}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -276,7 +326,7 @@ export default function ExpensesPage() {
         </div>
 
         {/* Expense List */}
-        <div className="px-8 pb-20">
+        <div className="px-4 pb-32">
           <ExpenseList
             expenses={filteredExpenses}
             categories={categories}
@@ -288,14 +338,14 @@ export default function ExpensesPage() {
         </div>
 
         {/* Upload Receipt Button */}
-        <div className="sticky bottom-0 left-0 right-0 flex items-center justify-center -mx-[25px] mt-auto">
+        <div className="fixed bottom-0 left-0 right-0 flex items-center justify-center w-screen md:w-[430px] md:left-1/2 md:-translate-x-1/2">
           <Image
             src="/wave.png"
             alt="Wave Background"
             layout="responsive"
             width={100}
             height={4}
-            className="pointer-events-none w-[calc(100%+40px)]"
+            className="pointer-events-none w-full"
             priority
           />
           <div
@@ -381,6 +431,83 @@ export default function ExpensesPage() {
           }}
           initialFile={selectedFile}
         />
+
+        <FilterDialog
+          open={showFilterDialog}
+          onOpenChange={setShowFilterDialog}
+          categories={categories}
+          onFilter={handleFilter}
+        />
+
+        {/* Slide-up Modal */}
+        {selectedExpense && (
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 transition-opacity duration-300"
+            onClick={() => setSelectedExpense(null)}
+          >
+            <div
+              className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 transform transition-all duration-300 ease-out animate-slide-up"
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxHeight: "85vh", overflowY: "auto" }}
+            >
+              {/* Modal Content */}
+              <div className="max-w-lg mx-auto">
+                {/* Drag Indicator */}
+                <div className="flex justify-center mb-6">
+                  <div className="w-12 h-1 bg-gray-200 rounded-full"></div>
+                </div>
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedExpense(null)}
+                  className="absolute right-6 top-6 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
+
+                {/* Expense Details */}
+                <div className="flex justify-between items-start mb-8">
+                  {/* Left Side - Title and Date */}
+                  <div className="flex flex-col">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      {selectedExpense.description || "Expense Details"}
+                    </h3>
+                    <span className="text-sm text-gray-500">
+                      {format(
+                        new Date(selectedExpense.expense_date),
+                        "MMM d, yyyy"
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Right Side - Amount and Category */}
+                  <div className="flex flex-col items-end">
+                    <span className="text-lg font-semibold text-gray-900 mb-1">
+                      ${formatAmount(selectedExpense.amount)}
+                    </span>
+                    <span className="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-700">
+                      {selectedExpense.category_details?.name ||
+                        "Uncategorized"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* View Receipt Button */}
+                {selectedExpense.receipt && (
+                  <div className="flex justify-center mt-auto">
+                    <Button
+                      variant="outline"
+                      className="w-full max-w-[200px] text-blue-600 hover:text-blue-700 border-blue-600 hover:border-blue-700"
+                      onClick={() => setShowFullImage(true)}
+                    >
+                      View Receipt
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
