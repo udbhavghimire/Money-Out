@@ -22,7 +22,7 @@ export default function SignIn() {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      router.push("/dashboard");
+      router.push("/");
     }
   }, [router]);
 
@@ -50,7 +50,7 @@ export default function SignIn() {
         description: "Logged in successfully",
       });
 
-      router.push("/dashboard");
+      router.push("/");
     } catch (error) {
       console.error("Login error:", error);
       const errorMessage = error.message || "Invalid credentials";
