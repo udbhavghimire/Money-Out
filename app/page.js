@@ -269,19 +269,25 @@ export default function ExpensesPage() {
             <div className="flex justify-start items-center">
               <div className="flex items-center gap-6 bg-[#fff6d3] shadow-sm rounded-3xl pl-3 pr-12 py-3 ml-4">
                 <div className="text-center">
-                  <p className="text-[10px] font-medium text-gray-900">$200</p>
+                  <p className="text-[10px] font-medium text-gray-900">
+                    ${summary.stats?.week?.toFixed(2) || "0.00"}
+                  </p>
                   <p className="text-[8px] uppercase font-bold text-black mt-0.5">
                     THIS WEEK
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-[10px] font-medium text-gray-900">$400</p>
+                  <p className="text-[10px] font-medium text-gray-900">
+                    ${summary.stats?.month?.toFixed(2) || "0.00"}
+                  </p>
                   <p className="text-[8px] uppercase font-bold text-black mt-0.5">
                     THIS MONTH
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-[10px] font-medium text-gray-900">$800</p>
+                  <p className="text-[10px] font-medium text-gray-900">
+                    ${summary.stats?.year?.toFixed(2) || "0.00"}
+                  </p>
                   <p className="text-[8px] uppercase font-bold text-black mt-0.5">
                     THIS YEAR
                   </p>

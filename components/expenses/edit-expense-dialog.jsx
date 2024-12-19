@@ -26,6 +26,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "@/lib/axios";
+import { X, Upload } from "lucide-react";
 
 export function EditExpenseDialog({
   open,
@@ -110,97 +111,143 @@ export function EditExpenseDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Edit Expense</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            placeholder="Expense Title"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
-            required
-          />
+      <DialogContent className="max-w-[350px] p-0">
+        <div className="flex flex-col items-center py-8">
+          <div className="flex flex-col items-center gap-4">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold text-gray-900">Edit Expense</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Update the details of your expense
+              </p>
+            </div>
 
-          <Input
-            type="number"
-            step="0.01"
-            placeholder="Amount"
-            value={formData.amount}
-            onChange={(e) =>
-              setFormData({ ...formData, amount: e.target.value })
-            }
-            required
-          />
-
-          <Select
-            value={formData.category}
-            onValueChange={(value) =>
-              setFormData({ ...formData, category: value })
-            }
-            required
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Textarea
-            placeholder="Description (optional)"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-          />
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left"
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(formData.expense_date, "PPP")}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={formData.expense_date}
-                onSelect={(date) =>
-                  setFormData({ ...formData, expense_date: date })
-                }
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <label htmlFor="receipt" className="text-sm text-gray-500">
-              Receipt (optional)
-            </label>
-            <Input
-              id="receipt"
-              type="file"
-              accept="image/*,.pdf"
-              onChange={handleFileChange}
-            />
+            {/* Selected File Display */}
+            {selectedFile && (
+              <div className="w-full max-w-[280px]">
+                <div className="flex items-center justify-between p-2 border rounded-md">
+                  <span className="text-sm truncate">
+                    {selectedFile.name || "Selected Receipt"}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedFile(null)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
+        </div>
 
-          <DialogFooter>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Updating..." : "Update Expense"}
-            </Button>
-          </DialogFooter>
+        <form onSubmit={handleSubmit} className="px-8 pb-8">
+          <div className="flex flex-col items-center space-y-3 w-full">
+            {/* Amount Input */}
+            <div className="w-full max-w-[280px] relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                $
+              </div>
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="Enter Amount"
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                className="text-center text-lg py-5 pl-8"
+                required
+              />
+            </div>
+
+            {/* Date Picker */}
+            <div className="w-full max-w-[280px]">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-center py-5">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {format(formData.expense_date, "dd MMMM, yyyy")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="center">
+                  <Calendar
+                    mode="single"
+                    selected={formData.expense_date}
+                    onSelect={(date) =>
+                      setFormData({ ...formData, expense_date: date || new Date() })
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Notes (previously description) */}
+            <div className="w-full max-w-[280px]">
+              <Textarea
+                placeholder="Notes"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                className="min-h-[80px]"
+                required
+              />
+            </div>
+
+            {/* Categories */}
+            <div className="w-full max-w-[280px]">
+              <div className="flex flex-wrap gap-2 justify-center">
+                {categories.map((category) => (
+                  <Button
+                    key={category.id}
+                    type="button"
+                    variant={formData.category === category.id ? "default" : "outline"}
+                    onClick={() => setFormData({ ...formData, category: category.id })}
+                    className={`
+                      h-6 rounded-full text-[10px]
+                      ${
+                        formData.category === category.id
+                          ? "bg-green-500 hover:bg-green-600 text-white"
+                          : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      }
+                      px-2 py-0 w-auto min-w-0 shrink-0
+                    `}
+                  >
+                    {category.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* File Input */}
+            <div className="w-full max-w-[280px] py-5">
+              <Input
+                id="receipt"
+                type="file"
+                accept="image/*,.pdf"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => document.getElementById('receipt').click()}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                Upload Receipt
+              </Button>
+            </div>
+
+            {/* Submit Button */}
+            <div className="w-full max-w-[280px]">
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Updating..." : "Save Changes"}
+              </Button>
+            </div>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
