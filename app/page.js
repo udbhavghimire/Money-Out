@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { isAuthenticated } from "@/lib/auth";
 import { CreateExpenseDialog } from "@/components/expenses/create-expense-dialog";
+import { syncUserWithBackend } from "@/lib/user-sync";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +42,7 @@ import { FilterDialog } from "@/components/expenses/filter-dialog";
 
 export default function ExpensesPage() {
   const router = useRouter();
+  const { user, isLoaded } = useUser();
   const [expenses, setExpenses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,17 +75,32 @@ export default function ExpensesPage() {
   const [showFullImage, setShowFullImage] = useState(false);
 
   useEffect(() => {
-    // Redirect to signin if not authenticated
-    if (!isAuthenticated()) {
-      router.push("/signin");
-    }
-  }, [router]);
+    const initializeUser = async () => {
+      if (isLoaded && !user) {
+        router.push("/sign-in");
+      } else if (user) {
+        try {
+          // Sync user with backend when they sign in
+          await syncUserWithBackend(user);
+          // After successful sync, fetch user data
+          fetchExpenses();
+          fetchCategories();
+          fetchSummary();
+        } catch (error) {
+          console.error("Error initializing user:", error);
+          toast({
+            variant: "destructive",
+            title: "Registration Error",
+            description:
+              error.message ||
+              "Failed to initialize user data. Please try again.",
+          });
+        }
+      }
+    };
 
-  useEffect(() => {
-    fetchExpenses();
-    fetchCategories();
-    fetchSummary();
-  }, []);
+    initializeUser();
+  }, [isLoaded, user]);
 
   const fetchExpenses = async () => {
     try {
@@ -251,7 +269,7 @@ export default function ExpensesPage() {
       <div className="relative z-10 w-full max-w-[430px] mx-auto px-4">
         {/* Money Out Header */}
         <div className="p-5">
-          <div className="flex justify-start">
+          <div className="flex flex-col items-start">
             <Image
               src="/money-out-logo.png"
               alt="Money Out"
@@ -259,6 +277,11 @@ export default function ExpensesPage() {
               height={22}
               className="object-contain"
             />
+            {user && (
+              <p className="text-lg font-semibold text-gray-800 mt-2">
+                Welcome, {user.firstName || user.emailAddresses[0].emailAddress}
+              </p>
+            )}
           </div>
         </div>
 
