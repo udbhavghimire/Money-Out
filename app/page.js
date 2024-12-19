@@ -19,6 +19,7 @@ import {
   Filter,
   Sliders,
   SlidersHorizontal,
+  Upload,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "@/lib/axios";
@@ -365,31 +366,60 @@ export default function ExpensesPage() {
         </div>
 
         {/* Receipt Upload Dialog */}
-        {showReceiptDialog && (
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            {showCameraView ? (
-              <CameraCapture
-                onCapture={handleCameraCapture}
-                onClose={() => setShowCameraView(false)}
-              />
-            ) : (
-              <div className="bg-white rounded-xl p-6 w-full max-w-sm mx-4">
-                <div className="text-center mb-6">
-                  <h3 className="text-xl font-semibold">Add Receipt</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Choose how you want to add your receipt
+        {showReceiptDialog && !showCameraView && (
+          <div
+            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowReceiptDialog(false)}
+          >
+            <div
+              className="bg-white rounded-3xl w-full max-w-sm mx-4 relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close button */}
+              <Button
+                variant="ghost"
+                className="absolute right-4 top-4"
+                onClick={() => setShowReceiptDialog(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+
+              <div className="p-8">
+                {/* Icon and Title */}
+                <div className="text-center mb-8">
+                  <div className="flex justify-center mb-6">
+                    <div className="relative">
+                      {/* Three stacked receipt icons */}
+                      <div className="absolute -right-4 -top-1 transform rotate-6">
+                        <div className="w-12 h-16 bg-gray-100 rounded-lg"></div>
+                      </div>
+                      <div className="absolute -left-4 -top-1 transform -rotate-6">
+                        <div className="w-12 h-16 bg-gray-100 rounded-lg"></div>
+                      </div>
+                      <div className="relative z-10">
+                        <div className="w-12 h-16 bg-gray-200 rounded-lg"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold uppercase mb-2">
+                    Upload Receipt
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Upload your receipt by taking photos or from your device
                   </p>
                 </div>
 
+                {/* Upload Buttons */}
                 <div className="space-y-3">
                   <Button
-                    className="w-full h-12 text-base"
+                    className="w-full h-14 text-base bg-black hover:bg-gray-800 rounded-full flex items-center justify-center gap-2"
                     onClick={() => setShowCameraView(true)}
                   >
-                    Take Photo
+                    <Camera className="h-5 w-5" />
+                    TAKE A PHOTO
                   </Button>
                   <Button
-                    className="w-full h-12 text-base"
+                    className="w-full h-14 text-base bg-black hover:bg-gray-800 rounded-full flex items-center justify-center gap-2"
                     onClick={() => {
                       const input = document.createElement("input");
                       input.type = "file";
@@ -404,19 +434,25 @@ export default function ExpensesPage() {
                       input.click();
                     }}
                   >
-                    Upload from Gallery
+                    <Upload className="h-5 w-5" />
+                    UPLOAD FROM DEVICE
                   </Button>
                 </div>
-
-                <Button
-                  variant="ghost"
-                  className="absolute right-4 top-4"
-                  onClick={() => setShowReceiptDialog(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
               </div>
-            )}
+            </div>
+          </div>
+        )}
+
+        {/* Camera View */}
+        {showCameraView && (
+          <div className="fixed inset-0 z-50">
+            <CameraCapture
+              onCapture={handleCameraCapture}
+              onClose={() => {
+                setShowCameraView(false);
+                setShowReceiptDialog(false);
+              }}
+            />
           </div>
         )}
 
