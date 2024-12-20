@@ -237,115 +237,281 @@ export default function ExpensesPage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden">
-      {/* Background Container */}
+      {/* Background Container - Updated with desktop styles */}
       <div
-        className="fixed inset-0 z-0 w-full md:w-[430px] md:left-1/2 md:-translate-x-1/2"
+        className="fixed inset-0 z-0 w-full md:w-[100%] md:left-0 md:translate-x-0 md:bg-gray-50"
         style={{
           backgroundImage: 'url("/bg.png")',
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
+          "@media (min-width: 768px)": {
+            backgroundSize: "30%",
+            backgroundPosition: "left center",
+          },
         }}
       />
 
-      {/* Content Container */}
-      <div className="relative z-10 w-full max-w-[430px] mx-auto px-4">
-        {/* Money Out Header */}
-        <div className="p-5">
-          <div className="flex justify-start">
+      {/* Content Container - Updated with desktop layout */}
+      <div className="relative z-10 w-full max-w-[430px] mx-auto px-4 md:max-w-none md:px-0">
+        {/* Desktop Header */}
+        <div className="hidden md:block w-full bg-white border-b">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <Image
               src="/money-out-logo.png"
               alt="Money Out"
-              width={70}
-              height={22}
+              width={100}
+              height={32}
               className="object-contain"
             />
-          </div>
-        </div>
-
-        {/* Stats Section */}
-        <div className="sticky top-0 z-10">
-          <div className="p-3">
-            <div className="flex justify-start items-center">
-              <div className="flex items-center gap-6 bg-[#fff6d3] shadow-sm rounded-3xl pl-3 pr-12 py-3 ml-4">
-                <div className="text-center">
-                  <p className="text-[10px] font-medium text-gray-900">
-                    ${summary.stats?.week?.toFixed(2) || "0.00"}
-                  </p>
-                  <p className="text-[8px] uppercase font-bold text-black mt-0.5">
-                    THIS WEEK
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-[10px] font-medium text-gray-900">
-                    ${summary.stats?.month?.toFixed(2) || "0.00"}
-                  </p>
-                  <p className="text-[8px] uppercase font-bold text-black mt-0.5">
-                    THIS MONTH
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-[10px] font-medium text-gray-900">
-                    ${summary.stats?.year?.toFixed(2) || "0.00"}
-                  </p>
-                  <p className="text-[8px] uppercase font-bold text-black mt-0.5">
-                    THIS YEAR
-                  </p>
-                </div>
-              </div>
-
-              {/* Filter Button */}
-              <div className="flex items-center mx-5">
-                <button
-                  className="flex flex-col items-center"
-                  onClick={() => setShowFilterDialog(true)}
-                >
-                  <SlidersHorizontal
-                    className="h-4 w-4 text-gray-900"
-                    strokeWidth={2.5}
-                  />
-                  <span className="text-[8px] uppercase font-medium text-gray-900 mt-0.5">
-                    FILTER
-                  </span>
-                </button>
-              </div>
+            <div className="flex items-center gap-4">
+              <Button variant="outline" className="rounded-full">
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
             </div>
           </div>
         </div>
 
-        {/* Search Section */}
-        <div className="p-5">
-          <div className="mx-4">
-            <h2 className="text-blue-600 text-base font-semibold mb-2">
-              EXPENSE HISTORY
-            </h2>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input
-                placeholder="SEARCH THE RECEIPT"
-                className="pl-10 bg-transparent border border-2 border-gray-300/50 rounded-3xl h-9 placeholder:text-gray-500 w-60"
-                style={{ fontSize: "12px" }}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+        {/* Desktop Layout Container */}
+        <div className="md:max-w-7xl md:mx-auto md:px-6 md:py-8 md:flex md:gap-8">
+          {/* Mobile-only header */}
+          <div className="p-5 md:hidden">
+            <div className="flex justify-start">
+              <Image
+                src="/money-out-logo.png"
+                alt="Money Out"
+                width={70}
+                height={22}
+                className="object-contain"
+              />
+            </div>
+          </div>
+
+          {/* Left Sidebar - Filters and Stats */}
+          <div className="md:w-80 md:flex-shrink-0">
+            <div className="sticky top-24 space-y-6">
+              {/* Desktop Filter Section - Now on top */}
+              <div className="hidden md:block bg-white rounded-2xl p-6 shadow-sm">
+                <h2 className="text-lg font-semibold mb-4">Filters</h2>
+                <Button
+                  className="w-full justify-start"
+                  variant="outline"
+                  onClick={() => setShowFilterDialog(true)}
+                >
+                  <SlidersHorizontal className="h-4 w-4 mr-2" />
+                  Filter Expenses
+                </Button>
+              </div>
+
+              {/* Stats Section - Desktop Only */}
+              <div className="hidden md:block">
+                <div className="md:bg-white md:rounded-2xl md:p-6 md:shadow-sm">
+                  <h2 className="text-lg font-semibold mb-4">Overview</h2>
+                  <div className="space-y-4">
+                    <div className="border-b pb-4">
+                      <p className="text-sm text-gray-500">This Week</p>
+                      <p className="text-md font-bold">
+                        $
+                        {(summary.stats?.week || 0).toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                    </div>
+                    <div className="border-b pb-4">
+                      <p className="text-sm text-gray-500">This Month</p>
+                      <p className="text-md font-bold">
+                        $
+                        {(summary.stats?.month || 0).toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">This Year</p>
+                      <p className="text-md font-bold">
+                        $
+                        {(summary.stats?.year || 0).toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Stats Section */}
+              <div className="md:hidden">
+                {/* Stats and Filter Section */}
+                <div className="sticky top-0 z-10">
+                  <div className="">
+                    <div className="flex justify-start items-center">
+                      <div className="flex items-center gap-6 bg-[#fff6d3] shadow-sm rounded-3xl pl-3 pr-12 py-3 ml-4">
+                        <div className="text-center">
+                          <p className="text-[10px] font-medium text-gray-900">
+                            $
+                            {(summary.stats?.week || 0).toLocaleString(
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}
+                          </p>
+                          <p className="text-[8px] uppercase font-bold text-black mt-0.5">
+                            THIS WEEK
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-[10px] font-medium text-gray-900">
+                            $
+                            {(summary.stats?.month || 0).toLocaleString(
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}
+                          </p>
+                          <p className="text-[8px] uppercase font-bold text-black mt-0.5">
+                            THIS MONTH
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-[10px] font-medium text-gray-900">
+                            $
+                            {(summary.stats?.year || 0).toLocaleString(
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}
+                          </p>
+                          <p className="text-[8px] uppercase font-bold text-black mt-0.5">
+                            THIS YEAR
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Filter Button */}
+                      <div className="flex items-center mx-5">
+                        <button
+                          className="flex flex-col items-center"
+                          onClick={() => setShowFilterDialog(true)}
+                        >
+                          <SlidersHorizontal
+                            className="h-4 w-4 text-gray-900"
+                            strokeWidth={2.5}
+                          />
+                          <span className="text-[8px] uppercase font-medium text-gray-900 mt-0.5">
+                            FILTER
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Search Section */}
+                <div className="p-5">
+                  <div className="">
+                    {/* Selected Category Indicator */}
+                    {activeFilters.category && (
+                      <div className="mb-3">
+                        {categories.map((category) => {
+                          if (
+                            category.id.toString() === activeFilters.category
+                          ) {
+                            return (
+                              <div key={category.id} className="inline-flex">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-[11px] h-7 px-3 rounded-full bg-black text-white hover:bg-black/90 flex items-center gap-2"
+                                  onClick={() => {
+                                    // Reset the category filter
+                                    handleFilter({
+                                      ...activeFilters,
+                                      category: "",
+                                    });
+                                    // Also reset the selected category in the filter dialog
+                                    setShowFilterDialog(false);
+                                  }}
+                                >
+                                  {category.name}
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            );
+                          }
+                          return null;
+                        })}
+                      </div>
+                    )}
+                    <h2 className="text-blue-600 text-base font-semibold mb-2">
+                      EXPENSE HISTORY
+                    </h2>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                      <Input
+                        placeholder="SEARCH THE RECEIPT"
+                        className="pl-10 bg-transparent border border-2 border-gray-300/50 rounded-3xl h-9 placeholder:text-gray-500 w-60"
+                        style={{ fontSize: "12px" }}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="md:flex-1 md:bg-white md:rounded-2xl md:p-6 md:shadow-sm">
+            {/* Search and Upload Section */}
+            <div className="md:flex md:justify-between md:items-center md:mb-6 hidden">
+              <div className="relative md:w-96">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Input
+                  placeholder="SEARCH THE RECEIPT"
+                  className="pl-10 bg-transparent border-2 border-gray-300/50 rounded-3xl h-9 placeholder:text-gray-500"
+                  style={{ fontSize: "12px" }}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              {/* Desktop Upload Button */}
+              <Button
+                className=" md:flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+                onClick={() => setShowReceiptDialog(true)}
+              >
+                <Upload className="h-4 w-4" />
+                Upload Receipt
+              </Button>
+            </div>
+
+            {/* Expense List */}
+            <div className="md:mt-6 mx-5 md:mx-0">
+              <ExpenseList
+                expenses={filteredExpenses}
+                categories={categories}
+                onExpenseUpdated={() => {
+                  fetchExpenses();
+                  fetchSummary();
+                }}
               />
             </div>
           </div>
         </div>
 
-        {/* Expense List */}
-        <div className="px-4 pb-32">
-          <ExpenseList
-            expenses={filteredExpenses}
-            categories={categories}
-            onExpenseUpdated={() => {
-              fetchExpenses();
-              fetchSummary();
-            }}
-          />
-        </div>
-
-        {/* Upload Receipt Button */}
-        <div className="fixed bottom-0 left-0 right-0 flex items-center justify-center w-screen md:w-[430px] md:left-1/2 md:-translate-x-1/2">
+        {/* Mobile-only bottom upload button */}
+        <div className="fixed bottom-0 left-0 right-0 md:hidden flex items-center justify-center w-screen md:w-[430px] md:left-1/2 md:-translate-x-1/2">
           <Image
             src="/wave.png"
             alt="Wave Background"
@@ -474,13 +640,6 @@ export default function ExpensesPage() {
           initialFile={selectedFile}
         />
 
-        <FilterDialog
-          open={showFilterDialog}
-          onOpenChange={setShowFilterDialog}
-          categories={categories}
-          onFilter={handleFilter}
-        />
-
         {/* Slide-up Modal */}
         {selectedExpense && (
           <div
@@ -550,6 +709,15 @@ export default function ExpensesPage() {
             </div>
           </div>
         )}
+
+        {/* Filter Dialog */}
+        <FilterDialog
+          open={showFilterDialog}
+          onOpenChange={setShowFilterDialog}
+          categories={categories}
+          onFilter={handleFilter}
+          activeFilters={activeFilters}
+        />
       </div>
     </div>
   );
