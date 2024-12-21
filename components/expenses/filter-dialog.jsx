@@ -55,18 +55,18 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[90%] h-auto max-h-[85vh] bg-white rounded-lg p-0 md:relative md:inset-auto md:translate-x-0 md:translate-y-0 md:w-full max-w-[350px]">
+      <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[90%] h-auto max-h-[85vh] bg-white rounded-lg p-0 max-w-[350px]">
         <DialogHeader className="p-4 border-b">
           <DialogTitle className="text-lg font-semibold">Filter Expenses</DialogTitle>
         </DialogHeader>
 
-        <div className="p-4">
-          <div className="space-y-4">
-            <div>
+        <div className="py-2 px-4">
+          <div className="space-y-5 text-center">
+            <div className="">
               <Label className="text-sm font-medium mb-3 block">
-                Category
+                Select a category
               </Label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 justify-center">
                 {categories.map((category) => (
                   <Button
                     key={category.id}
@@ -86,8 +86,8 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
             </div>
 
             <div className="pt-5">
-              <Label className="text-sm font-medium mb-3 block">
-                Date Range
+              <Label className="text-sm font-medium mb-2 block">
+                Select date range
               </Label>
               <div className="flex gap-3">
                 <div className="flex-1">
@@ -96,7 +96,8 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
                   </label>
                   <Input
                     type="date"
-                    className="w-full rounded-lg border border-gray-300 p-4 text-sm"
+                    placeholder="yyyy-MM-dd"
+                    className="w-full rounded-lg border border-gray-300 p-4 text-sm placeholder:text-gray-400"
                     value={dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : ""}
                     onChange={(e) => 
                       setDateRange(prev => ({ ...prev, from: new Date(e.target.value) }))
@@ -109,7 +110,8 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
                   </label>
                   <Input
                     type="date"
-                    className="w-full rounded-lg border border-gray-300 p-4 text-sm"
+                    placeholder="yyyy-MM-dd"
+                    className="w-full rounded-lg border border-gray-300 p-4 text-sm placeholder:text-gray-400"
                     value={dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : ""}
                     onChange={(e) => 
                       setDateRange(prev => ({ ...prev, to: new Date(e.target.value) }))

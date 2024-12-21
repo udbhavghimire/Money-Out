@@ -7,9 +7,9 @@ import Script from "next/script";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Money Out - Expense Management Made Simple",
+  title: "Trusted Simple & Fast Expense Tracker | Money Out",
   description:
-    "Effortless Expense Tracking, Budgeting & Financial Insights for Individuals and Businesses",
+    "Money Out is the ultimate expense tracker for solo entrepreneurs. Easily log and manage your expenses in seconds, gain financial clarity, and focus on growing your business with our user-friendly tool.",
 };
 
 export default function RootLayout({ children }) {

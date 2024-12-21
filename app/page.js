@@ -20,6 +20,7 @@ import {
   Sliders,
   SlidersHorizontal,
   Upload,
+  Download,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "@/lib/axios";
@@ -38,6 +39,7 @@ import { WaveBackground } from "@/components/ui/wave-background";
 import Image from "next/image";
 import { CameraCapture } from "@/components/ui/camera";
 import { FilterDialog } from "@/components/expenses/filter-dialog";
+import { ExportDialog } from "@/components/expenses/export-dialog";
 
 export default function ExpensesPage() {
   const router = useRouter();
@@ -71,6 +73,7 @@ export default function ExpensesPage() {
   const [activeFilters, setActiveFilters] = useState({});
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [showFullImage, setShowFullImage] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   useEffect(() => {
     // Redirect to signin if not authenticated
@@ -397,8 +400,8 @@ export default function ExpensesPage() {
                         </div>
                       </div>
 
-                      {/* Filter Button */}
-                      <div className="flex items-center mx-5">
+                      {/* Filter and Export Buttons */}
+                      <div className="flex items-center gap-4 mx-5">
                         <button
                           className="flex flex-col items-center"
                           onClick={() => setShowFilterDialog(true)}
@@ -409,6 +412,19 @@ export default function ExpensesPage() {
                           />
                           <span className="text-[8px] uppercase font-medium text-gray-900 mt-0.5">
                             FILTER
+                          </span>
+                        </button>
+
+                        <button
+                          className="flex flex-col items-center"
+                          onClick={() => setShowExportDialog(true)}
+                        >
+                          <Download
+                            className="h-4 w-4 text-gray-900"
+                            strokeWidth={2.5}
+                          />
+                          <span className="text-[8px] uppercase font-medium text-gray-900 mt-0.5">
+                            EXPORT
                           </span>
                         </button>
                       </div>
@@ -717,6 +733,14 @@ export default function ExpensesPage() {
           categories={categories}
           onFilter={handleFilter}
           activeFilters={activeFilters}
+        />
+
+        {/* Export Dialog */}
+        <ExportDialog
+          open={showExportDialog}
+          onOpenChange={setShowExportDialog}
+          expenses={filteredExpenses}
+          categories={categories}
         />
       </div>
     </div>

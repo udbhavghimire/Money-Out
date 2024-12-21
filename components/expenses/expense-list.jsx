@@ -9,6 +9,16 @@ import { Input } from "@/components/ui/input";
 import { CalendarIcon } from "lucide-react";
 import Image from "next/image";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
   const [editingExpense, setEditingExpense] = useState(null);
@@ -16,6 +26,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
   const { toast } = useToast();
   const [receiptModalOpen, setReceiptModalOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const [expenseToDelete, setExpenseToDelete] = useState(null);
 
   // Group expenses by time period
   const groupedExpenses = expenses.reduce((groups, expense) => {
@@ -166,8 +177,12 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
   };
 
   const handleDelete = async (expenseId) => {
+    setExpenseToDelete(expenseId);
+  };
+
+  const confirmDelete = async () => {
     try {
-      await axios.delete(`/api/expenses/${expenseId}/`);
+      await axios.delete(`/api/expenses/${expenseToDelete}/`);
       onExpenseUpdated();
       toast({
         title: "Success",
@@ -179,6 +194,8 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
         title: "Error",
         description: "Failed to delete expense",
       });
+    } finally {
+      setExpenseToDelete(null);
     }
   };
 
@@ -279,6 +296,31 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
         categories={categories}
         onExpenseUpdated={onExpenseUpdated}
       />
+
+      <AlertDialog open={!!expenseToDelete} onOpenChange={() => setExpenseToDelete(null)}>
+        <AlertDialogContent className="max-w-[320px] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the expense.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              className="rounded-full"
+              onClick={() => setExpenseToDelete(null)}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              className="rounded-full bg-red-600 hover:bg-red-700"
+              onClick={confirmDelete}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
