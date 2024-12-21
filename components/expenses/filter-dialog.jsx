@@ -57,7 +57,7 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[90%] h-auto max-h-[85vh] bg-white rounded-lg p-0 max-w-[350px]">
         <DialogHeader className="p-4 border-b">
-          <DialogTitle className="text-lg font-semibold">Filter Expenses</DialogTitle>
+          <DialogTitle className="text-lg font-semibold text-center">Filter Expenses</DialogTitle>
         </DialogHeader>
 
         <div className="py-2 px-4">
