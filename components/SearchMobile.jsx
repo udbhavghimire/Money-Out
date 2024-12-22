@@ -4,39 +4,9 @@ import { Search, X } from "lucide-react";
 
 export function SearchMobile({ activeFilters, categories, handleFilter, searchQuery, setSearchQuery, setShowFilterDialog }) {
   return (
-    <div className="p-5 md:hidden">
+    <div className="p-5 px-8 md:hidden">
       <div className="">
-        {/* Selected Category Indicator */}
-        {activeFilters.category && (
-          <div className="mb-3">
-            {categories.map((category) => {
-              if (category.id.toString() === activeFilters.category) {
-                return (
-                  <div key={category.id} className="inline-flex">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-[11px] h-7 px-3 rounded-full bg-black text-white hover:bg-black/90 flex items-center gap-2"
-                      onClick={() => {
-                        // Reset the category filter
-                        handleFilter({
-                          ...activeFilters,
-                          category: "",
-                        });
-                        // Also reset the selected category in the filter dialog
-                        setShowFilterDialog(false);
-                      }}
-                    >
-                      {category.name}
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                );
-              }
-              return null;
-            })}
-          </div>
-        )}
+   
         <h2 className="text-blue-600 text-base font-semibold mb-2">
           EXPENSE HISTORY
         </h2>

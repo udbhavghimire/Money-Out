@@ -20,6 +20,9 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 
+// Add this constant at the top of the file to easily switch between modes
+const USE_SLIDE_ANIMATION = false; // Set to true for slide animation, false for expansion
+
 export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
   const [editingExpense, setEditingExpense] = useState(null);
   const [expandedExpenseId, setExpandedExpenseId] = useState(null);
@@ -28,18 +31,22 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
 
-  // Group expenses by time period
+  // Group expenses by time period and specific dates
   const groupedExpenses = expenses.reduce((groups, expense) => {
     const expenseDate = parseISO(expense.expense_date);
     if (isToday(expenseDate)) {
       groups.today.push(expense);
     } else if (isYesterday(expenseDate)) {
       groups.yesterday.push(expense);
-    } else if (isThisWeek(expenseDate, { weekStartsOn: 1 })) {
-      groups.thisWeek.push(expense);
+    } else {
+      const dateKey = format(expenseDate, "MMM dd, yyyy");
+      if (!groups.byDate[dateKey]) {
+        groups.byDate[dateKey] = [];
+      }
+      groups.byDate[dateKey].push(expense);
     }
     return groups;
-  }, { today: [], yesterday: [], thisWeek: [] });
+  }, { today: [], yesterday: [], byDate: {} });
 
   const handleReceiptClick = (e, receiptUrl) => {
     e.stopPropagation();
@@ -64,10 +71,11 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
   }, [expandedExpenseId]);
 
   const renderExpenseItem = (expense) => (
-    <div key={expense.id} className="relative overflow-hidden expense-item">
+    <div key={expense.id} className="relative expense-item">
+      {/* Main expense item */}
       <div 
-        className={`py-1.5 flex justify-between items-start border-b border-gray-100 cursor-pointer transition-colors
-          ${expandedExpenseId === expense.id ? 'bg-white shadow-sm' : 'hover:bg-gray-50'}`}
+        className={`py-1.5 pr-4 flex justify-between items-start border-b border-gray-100 cursor-pointer transition-all
+          ${expandedExpenseId === expense.id ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
         onClick={(e) => {
           e.stopPropagation();
           setExpandedExpenseId(expandedExpenseId === expense.id ? null : expense.id);
@@ -96,23 +104,21 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="text-right">
-            <p className="text-xs font-semibold leading-none">${formatAmount(expense.amount)}</p>
-            <p className="text-[10px] text-gray-500 uppercase mt-0.5 leading-none">
-              {expense.category_details?.name || "OFFICE / ADMIN"}
-            </p>
-          </div>
+
+        <div className="text-right">
+          <p className="text-xs font-semibold leading-none">${formatAmount(expense.amount)}</p>
+          <p className="text-[10px] text-gray-500 uppercase mt-0.5 leading-none">
+            {expense.category_details?.name || "OFFICE / ADMIN"}
+          </p>
         </div>
       </div>
 
+      {/* Expansion mode actions - Now with slide down animation */}
       <div 
-        className={`absolute inset-y-0 right-0 flex items-center px-2 
-          backdrop-blur-md bg-white/60
-          transition-transform duration-300 ease-out
-          ${expandedExpenseId === expense.id ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out
+          ${!USE_SLIDE_ANIMATION && expandedExpenseId === expense.id ? 'max-h-[50px] opacity-100' : 'max-h-0 opacity-0'}`}
       >
-        <div className="flex items-center gap-0">
+        <div className="flex justify-end gap-1 py-2  border-b border-gray-100">
           {expense.receipt && (
             <button
               onClick={(e) => {
@@ -121,7 +127,8 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
               }}
               className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <Receipt className="h-5 w-5 text-blue-500" />
+              <Receipt className="h-4 w-4 text-blue-500" />
+              <span className="sr-only">View Receipt</span>
             </button>
           )}
           <button
@@ -132,7 +139,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
             className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
           >
             <svg
-              className="h-5 w-5 text-gray-500"
+              className="h-4 w-4 text-gray-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -144,6 +151,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
                 d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
               />
             </svg>
+            <span className="sr-only">Edit</span>
           </button>
           <button
             onClick={(e) => {
@@ -153,7 +161,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
             className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
           >
             <svg
-              className="h-5 w-5 text-red-500"
+              className="h-4 w-4 text-red-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -165,9 +173,76 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
               />
             </svg>
+            <span className="sr-only">Delete</span>
           </button>
         </div>
       </div>
+
+      {/* Slide animation mode */}
+      {USE_SLIDE_ANIMATION && (
+        <div 
+          className={`absolute inset-y-0 right-0 flex items-center px-2 
+            backdrop-blur-md bg-white/60
+            transition-transform duration-300 ease-out
+            ${expandedExpenseId === expense.id ? 'translate-x-0' : 'translate-x-full'}`}
+        >
+          <div className="flex items-center gap-0">
+            {expense.receipt && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleReceiptClick(e, expense.receipt);
+                }}
+                className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <Receipt className="h-5 w-5 text-blue-500" />
+              </button>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEditExpense(expense);
+              }}
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <svg
+                className="h-5 w-5 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                />
+              </svg>
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(expense.id);
+              }}
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <svg
+                className="h-5 w-5 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -212,21 +287,6 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
     setEditingExpense(expense);
   };
 
-  // Add a function to format section headers
-  const formatSectionHeader = (expenses) => {
-    if (!expenses || expenses.length === 0) return '';
-    
-    const date = parseISO(expenses[0].expense_date);
-    
-    if (isToday(date)) {
-      return 'TODAY';
-    } else if (isYesterday(date)) {
-      return 'YESTERDAY';
-    } else {
-      return format(date, 'MMM dd, yyyy').toUpperCase();
-    }
-  };
-
   return (
     <>
       <div className="divide-y divide-gray-100 mb-16">
@@ -234,7 +294,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
         {groupedExpenses.today.length > 0 && (
           <div className="py-1">
             <h2 className="text-xs font-medium text-blue-600 mb-1">
-              {formatSectionHeader(groupedExpenses.today)}
+              TODAY
             </h2>
             <div>{groupedExpenses.today.map(renderExpenseItem)}</div>
           </div>
@@ -244,21 +304,21 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
         {groupedExpenses.yesterday.length > 0 && (
           <div className="py-1">
             <h2 className="text-xs font-medium text-blue-600 mb-1">
-              {formatSectionHeader(groupedExpenses.yesterday)}
+              YESTERDAY
             </h2>
             <div>{groupedExpenses.yesterday.map(renderExpenseItem)}</div>
           </div>
         )}
 
-        {/* This Week's Expenses */}
-        {groupedExpenses.thisWeek.length > 0 && (
-          <div className="py-1">
+        {/* Expenses by Date */}
+        {Object.entries(groupedExpenses.byDate).map(([date, expenses]) => (
+          <div key={date} className="py-1">
             <h2 className="text-xs font-medium text-blue-600 mb-1">
-              {formatSectionHeader(groupedExpenses.thisWeek)}
+              {date.toUpperCase()}
             </h2>
-            <div>{groupedExpenses.thisWeek.map(renderExpenseItem)}</div>
+            <div>{expenses.map(renderExpenseItem)}</div>
           </div>
-        )}
+        ))}
       </div>
 
       {/* Add Receipt Modal */}

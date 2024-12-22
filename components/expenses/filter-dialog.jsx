@@ -18,26 +18,45 @@ import { CalendarIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export function FilterDialog({ open, onOpenChange, categories, onFilter, activeFilters }) {
-  const [selectedCategory, setSelectedCategory] = useState(activeFilters?.category || "all");
+  const [selectedCategories, setSelectedCategories] = useState(
+    activeFilters?.categories || []
+  );
   const [dateRange, setDateRange] = useState({
-    from: undefined,
-    to: undefined,
+    from: activeFilters?.dateRange?.from || undefined,
+    to: activeFilters?.dateRange?.to || undefined,
   });
 
   useEffect(() => {
-    setSelectedCategory(activeFilters?.category || "all");
+    setSelectedCategories(activeFilters?.categories || []);
+    setDateRange({
+      from: activeFilters?.dateRange?.from || undefined,
+      to: activeFilters?.dateRange?.to || undefined,
+    });
   }, [activeFilters]);
 
   useEffect(() => {
     if (!open) {
-      setSelectedCategory(activeFilters?.category || "all");
-      setDateRange({ from: undefined, to: undefined });
+      setSelectedCategories(activeFilters?.categories || []);
+      setDateRange({
+        from: activeFilters?.dateRange?.from || undefined,
+        to: activeFilters?.dateRange?.to || undefined,
+      });
     }
   }, [open, activeFilters]);
 
+  const handleCategoryToggle = (categoryId) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(categoryId)) {
+        return prev.filter(id => id !== categoryId);
+      } else {
+        return [...prev, categoryId];
+      }
+    });
+  };
+
   const handleFilter = () => {
     onFilter({
-      category: selectedCategory === "all" ? "" : selectedCategory,
+      categories: selectedCategories,
       dateRange: {
         from: dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
         to: dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
@@ -47,9 +66,12 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
   };
 
   const handleReset = () => {
-    setSelectedCategory("all");
+    setSelectedCategories([]);
     setDateRange({ from: undefined, to: undefined });
-    onFilter({});
+    onFilter({
+      categories: [],
+      dateRange: { from: undefined, to: undefined },
+    });
     onOpenChange(false);
   };
 
@@ -64,17 +86,17 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
           <div className="space-y-5 text-center">
             <div className="">
               <Label className="text-sm font-medium mb-3 block">
-                Select a category
+                Select categories
               </Label>
               <div className="flex flex-wrap gap-2 justify-center">
                 {categories.map((category) => (
                   <Button
                     key={category.id}
-                    variant={selectedCategory === category.id.toString() ? "default" : "outline"}
-                    onClick={() => setSelectedCategory(category.id.toString())}
+                    variant={selectedCategories.includes(category.id.toString()) ? "default" : "outline"}
+                    onClick={() => handleCategoryToggle(category.id.toString())}
                     size="sm"
                     className={`text-[11px] h-7 px-3 rounded-full ${
-                      selectedCategory === category.id.toString() 
+                      selectedCategories.includes(category.id.toString())
                         ? "bg-black text-white hover:bg-black/90" 
                         : "hover:bg-gray-100"
                     }`}

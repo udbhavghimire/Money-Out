@@ -1,18 +1,55 @@
+"use client";
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Button } from './button';
 import { X, Camera, RotateCcw, Upload } from 'lucide-react';
 
 export function CameraCapture({ onCapture, onClose }) {
   const videoRef = useRef(null);
-  const streamRef = useRef(null);
-  const [capturedImage, setCapturedImage] = useState(null);
+  const [stream, setStream] = useState(null);
+  const [permissionStatus, setPermissionStatus] = useState(null);
   const modalRef = useRef(null);
 
   useEffect(() => {
-    startCamera();
+    // Check if we already have permission stored
+    const checkStoredPermission = async () => {
+      try {
+        const result = await navigator.permissions.query({ name: 'camera' });
+        setPermissionStatus(result.state);
+        
+        if (result.state === 'granted') {
+          startCamera();
+        }
+      } catch (error) {
+        console.log('Permission query not supported, falling back to getUserMedia');
+        startCamera();
+      }
+    };
+
+    const startCamera = async () => {
+      try {
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+          audio: false,
+        });
+        
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+        }
+        setStream(mediaStream);
+        setPermissionStatus('granted');
+      } catch (error) {
+        console.error("Error accessing camera:", error);
+        setPermissionStatus('denied');
+      }
+    };
+
+    checkStoredPermission();
+
+    // Cleanup function
     return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
       }
     };
   }, []);
@@ -23,65 +60,24 @@ export function CameraCapture({ onCapture, onClose }) {
     }
   };
 
-  const startCamera = async () => {
-    try {
-      const constraints = {
-        video: {
-          facingMode: { exact: "environment" },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        }
-      };
-
-      const fallbackConstraints = {
-        video: {
-          facingMode: "environment",
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        }
-      };
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (err) {
-        console.log("Falling back to any available camera");
-        const fallbackStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
-        streamRef.current = fallbackStream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = fallbackStream;
-        }
-      }
-    } catch (err) {
-      console.error("Error accessing camera:", err);
-    }
-  };
-
   const capturePhoto = () => {
-    const video = videoRef.current;
-    const canvas = document.createElement('canvas');
+    if (!videoRef.current) return;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
     
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const context = canvas.getContext("2d");
+    context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     
-    const context = canvas.getContext('2d');
-    context.drawImage(video, 0, 0);
-    
-    // Store the captured image data URL
-    setCapturedImage(canvas.toDataURL('image/jpeg', 0.95));
-    
-    // Stop the camera stream after capture
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-    }
+    canvas.toBlob((blob) => {
+      const file = new File([blob], "receipt.jpg", { type: "image/jpeg" });
+      onCapture(file);
+    }, "image/jpeg");
   };
 
   const handleRetake = () => {
-    setCapturedImage(null);
-    startCamera();
+    capturePhoto();
   };
 
   const handleUpload = () => {

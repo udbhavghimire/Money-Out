@@ -2,7 +2,7 @@ import { SlidersHorizontal, Download } from "lucide-react";
 
 export function StatsMobile({ summary, setShowFilterDialog, setShowExportDialog }) {
   return (
-    <div className="md:hidden">
+    <div className="md:hidden px-3">
       {/* Stats and Filter Section */}
       <div className="sticky top-0 z-10">
         <div className="">

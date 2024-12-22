@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isAuthenticated } from "@/lib/auth";
 import { CreateExpenseDialog } from "@/components/expenses/create-expense-dialog";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -42,7 +41,7 @@ import { FilterDialog } from "@/components/expenses/filter-dialog";
 import { ExportDialog } from "@/components/expenses/export-dialog";
 import { StatsMobile } from "@/components/StatsMobile";
 import { SearchMobile } from "@/components/SearchMobile";
-
+import SelectedFilter from "@/components/SelectedFilter";
 export default function ExpensesPage() {
   const router = useRouter();
   const [expenses, setExpenses] = useState([]);
@@ -72,7 +71,10 @@ export default function ExpensesPage() {
   const [showExpenseDialog, setShowExpenseDialog] = useState(false);
   const [showCameraView, setShowCameraView] = useState(false);
   const [showFilterDialog, setShowFilterDialog] = useState(false);
-  const [activeFilters, setActiveFilters] = useState({});
+  const [activeFilters, setActiveFilters] = useState({
+    categories: [],
+    dateRange: { from: undefined, to: undefined },
+  });
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [showFullImage, setShowFullImage] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -126,7 +128,10 @@ export default function ExpensesPage() {
   };
 
   const handleFilter = (filters) => {
-    setActiveFilters(filters);
+    setActiveFilters({
+      categories: filters.categories || [],
+      dateRange: filters.dateRange || { from: undefined, to: undefined },
+    });
   };
 
   const filteredExpenses = expenses.filter((expense) => {
@@ -137,8 +142,8 @@ export default function ExpensesPage() {
 
     // Category filter
     const matchesCategory =
-      !activeFilters.category ||
-      expense.category.toString() === activeFilters.category;
+      !activeFilters.categories?.length ||
+      activeFilters.categories.includes(expense.category.toString());
 
     // Date range filter
     const matchesDateRange = () => {
@@ -258,7 +263,7 @@ export default function ExpensesPage() {
       />
 
       {/* Mobile Stats Section */}
-      <div className="p-5 block md:hidden">
+      <div className="p-5 px-6 block md:hidden">
         <div className="">
           <Image
             src="/money-out-logo.png"
@@ -274,6 +279,16 @@ export default function ExpensesPage() {
         setShowFilterDialog={() => setShowFilterDialog(true)}
         setShowExportDialog={() => setShowExportDialog(true)}
       />
+
+      {/* Selected Filter Mobile */}
+      <div className="py-3 px-5 md:hidden">
+        <SelectedFilter
+          activeFilters={activeFilters}
+          categories={categories}
+          handleFilter={handleFilter}
+          setShowFilterDialog={setShowFilterDialog}
+        />
+      </div>
 
       {/* Mobile Search Section */}
       <SearchMobile
@@ -368,6 +383,16 @@ export default function ExpensesPage() {
                   </Button>
                 </div>
               </div>
+            </div>
+
+            {/* Selected Filter Desktop */}
+            <div className="hidden md:block">
+              <SelectedFilter
+                activeFilters={activeFilters}
+                categories={categories}
+                handleFilter={handleFilter}
+                setShowFilterDialog={setShowFilterDialog}
+              />
             </div>
 
             {/* Search and Upload Section */}
