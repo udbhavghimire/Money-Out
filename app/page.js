@@ -40,6 +40,8 @@ import Image from "next/image";
 import { CameraCapture } from "@/components/ui/camera";
 import { FilterDialog } from "@/components/expenses/filter-dialog";
 import { ExportDialog } from "@/components/expenses/export-dialog";
+import { StatsMobile } from "@/components/StatsMobile";
+import { SearchMobile } from "@/components/SearchMobile";
 
 export default function ExpensesPage() {
   const router = useRouter();
@@ -242,7 +244,7 @@ export default function ExpensesPage() {
     <div className="min-h-screen overflow-x-hidden">
       {/* Background Container - Updated with desktop styles */}
       <div
-        className="fixed inset-0 z-0 w-full md:w-[100%] md:left-0 md:translate-x-0 md:bg-gray-50"
+        className="fixed inset-0 -z-10 w-full md:w-[100%] md:left-0 md:translate-x-0 md:bg-gray-50"
         style={{
           backgroundImage: 'url("/bg.png")',
           backgroundSize: "cover",
@@ -253,6 +255,34 @@ export default function ExpensesPage() {
             backgroundPosition: "left center",
           },
         }}
+      />
+
+      {/* Mobile Stats Section */}
+      <div className="p-5 block md:hidden">
+        <div className="">
+          <Image
+            src="/money-out-logo.png"
+            alt="Money Out"
+            width={70}
+            height={22}
+            className=""
+          />
+        </div>
+      </div>
+      <StatsMobile
+        summary={summary}
+        setShowFilterDialog={() => setShowFilterDialog(true)}
+        setShowExportDialog={() => setShowExportDialog(true)}
+      />
+
+      {/* Mobile Search Section */}
+      <SearchMobile
+        activeFilters={activeFilters}
+        categories={categories}
+        handleFilter={handleFilter}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        setShowFilterDialog={setShowFilterDialog}
       />
 
       {/* Content Container - Updated with desktop layout */}
