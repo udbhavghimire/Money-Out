@@ -6,6 +6,19 @@ const nextConfig = {
       "admin.sixdesign.ca", // Added your domain
     ],
   },
+  headers: async () => {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Permissions-Policy",
+            value: "camera=self",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

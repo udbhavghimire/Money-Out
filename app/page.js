@@ -516,11 +516,35 @@ export default function ExpensesPage() {
                 <div className="space-y-3">
                   <Button
                     className="w-full h-14 text-base bg-black hover:bg-gray-800 rounded-full flex items-center justify-center gap-2"
-                    onClick={() => {
-                      setShowReceiptDialog(false);
-                      setTimeout(() => {
-                        setShowCameraView(true);
-                      }, 100);
+                    onClick={async () => {
+                      try {
+                        // Check for camera permissions first
+                        const permissionResult =
+                          await navigator.permissions.query({ name: "camera" });
+
+                        if (permissionResult.state === "denied") {
+                          alert(
+                            "Please enable camera access in your browser settings to use this feature."
+                          );
+                          return;
+                        }
+
+                        setShowReceiptDialog(false);
+                        // Small delay to ensure the receipt dialog is closed
+                        setTimeout(() => {
+                          setShowCameraView(true);
+                        }, 100);
+                      } catch (error) {
+                        console.error(
+                          "Error checking camera permissions:",
+                          error
+                        );
+                        // Fallback for browsers that don't support permission query
+                        setShowReceiptDialog(false);
+                        setTimeout(() => {
+                          setShowCameraView(true);
+                        }, 100);
+                      }
                     }}
                   >
                     <Camera className="h-5 w-5" />
@@ -553,15 +577,17 @@ export default function ExpensesPage() {
 
         {/* Camera View */}
         {showCameraView && (
-          <CameraCapture
-            onCapture={(file) => {
-              handleCameraCapture(file);
-              setShowCameraView(false);
-            }}
-            onClose={() => {
-              setShowCameraView(false);
-            }}
-          />
+          <div className="fixed inset-0 z-[9999] bg-black">
+            <CameraCapture
+              onCapture={(file) => {
+                handleCameraCapture(file);
+                setShowCameraView(false);
+              }}
+              onClose={() => {
+                setShowCameraView(false);
+              }}
+            />
+          </div>
         )}
 
         {/* Create Expense Dialog */}

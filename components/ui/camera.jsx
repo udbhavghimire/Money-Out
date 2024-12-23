@@ -12,58 +12,34 @@ export function CameraCapture({ onCapture, onClose }) {
   const modalRef = useRef(null);
 
   useEffect(() => {
-    const checkStoredPermission = async () => {
+    let mounted = true;
+
+    const initializeCamera = async () => {
       try {
-        const result = await navigator.permissions.query({ name: 'camera' });
-        setPermissionStatus(result.state);
-        
-        if (result.state === 'granted') {
-          startCamera();
+        // Check if the browser supports getUserMedia
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error('Camera API is not supported in this browser');
         }
+
+        // Try to start the camera
+        await startCamera();
       } catch (error) {
-        console.log('Permission query not supported, falling back to getUserMedia');
-        startCamera();
+        console.error('Camera initialization failed:', error);
+        if (mounted) {
+          setPermissionStatus('denied');
+        }
       }
     };
 
-    const startCamera = async () => {
-      try {
-        // First try to get the environment-facing (back) camera
-        const mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { exact: "environment" }
-          },
-          audio: false,
-        }).catch(async () => {
-          // If that fails, fall back to any available camera
-          return await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: false,
-          });
-        });
-        
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-          // Ensure video plays after setting srcObject
-          videoRef.current.play().catch(error => {
-            console.error("Error playing video:", error);
-          });
-        }
-        setStream(mediaStream);
-        setPermissionStatus('granted');
-      } catch (error) {
-        console.error("Error accessing camera:", error);
-        setPermissionStatus('denied');
-      }
-    };
-
-    // Start the camera when component mounts
-    checkStoredPermission();
+    initializeCamera();
 
     // Cleanup function
     return () => {
+      mounted = false;
       if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach(track => {
+          track.stop();
+        });
       }
     };
   }, []);
@@ -105,6 +81,46 @@ export function CameraCapture({ onCapture, onClose }) {
         });
         onCapture(file);
       });
+  };
+
+  const startCamera = async () => {
+    try {
+      // Request camera permissions explicitly first
+      const constraints = {
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        },
+        audio: false
+      };
+
+      // First try with exact environment camera
+      let mediaStream;
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { exact: 'environment' } },
+          audio: false
+        });
+      } catch (err) {
+        // If environment camera fails, try with any available camera
+        console.log('Falling back to any available camera');
+        mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      }
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        // Wait for the video to be loaded
+        await videoRef.current.play();
+      }
+      setStream(mediaStream);
+      setPermissionStatus('granted');
+    } catch (error) {
+      console.error("Error accessing camera:", error);
+      setPermissionStatus('denied');
+      // Show error to user
+      alert("Unable to access camera. Please ensure you've granted camera permissions.");
+    }
   };
 
   return (
