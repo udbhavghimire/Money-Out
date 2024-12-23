@@ -12,7 +12,6 @@ export function CameraCapture({ onCapture, onClose }) {
   const modalRef = useRef(null);
 
   useEffect(() => {
-    // Check if we already have permission stored
     const checkStoredPermission = async () => {
       try {
         const result = await navigator.permissions.query({ name: 'camera' });
@@ -29,13 +28,26 @@ export function CameraCapture({ onCapture, onClose }) {
 
     const startCamera = async () => {
       try {
+        // First try to get the environment-facing (back) camera
         const mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
+          video: {
+            facingMode: { exact: "environment" }
+          },
           audio: false,
+        }).catch(async () => {
+          // If that fails, fall back to any available camera
+          return await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false,
+          });
         });
         
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
+          // Ensure video plays after setting srcObject
+          videoRef.current.play().catch(error => {
+            console.error("Error playing video:", error);
+          });
         }
         setStream(mediaStream);
         setPermissionStatus('granted');
@@ -45,6 +57,7 @@ export function CameraCapture({ onCapture, onClose }) {
       }
     };
 
+    // Start the camera when component mounts
     checkStoredPermission();
 
     // Cleanup function
@@ -96,12 +109,12 @@ export function CameraCapture({ onCapture, onClose }) {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]"
       onClick={handleClickOutside}
     >
       <div 
         ref={modalRef}
-        className="relative w-[90%] max-w-sm bg-white rounded-3xl overflow-hidden"
+        className="relative w-full h-full md:w-[90%] md:h-auto md:max-w-sm md:bg-white md:rounded-3xl overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         {capturedImage ? (
@@ -142,13 +155,13 @@ export function CameraCapture({ onCapture, onClose }) {
             </div>
           </div>
         ) : (
-          // Show camera view
-          <div className="h-[80vh]">
+          <div className="h-full md:h-[80vh]">
             <video
               ref={videoRef}
               autoPlay
               playsInline
               className="w-full h-full object-cover"
+              style={{ transform: 'scaleX(-1)' }}
             />
             
             {/* Camera Actions */}

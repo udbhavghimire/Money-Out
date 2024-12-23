@@ -516,7 +516,12 @@ export default function ExpensesPage() {
                 <div className="space-y-3">
                   <Button
                     className="w-full h-14 text-base bg-black hover:bg-gray-800 rounded-full flex items-center justify-center gap-2"
-                    onClick={() => setShowCameraView(true)}
+                    onClick={() => {
+                      setShowReceiptDialog(false);
+                      setTimeout(() => {
+                        setShowCameraView(true);
+                      }, 100);
+                    }}
                   >
                     <Camera className="h-5 w-5" />
                     TAKE A PHOTO
@@ -548,15 +553,15 @@ export default function ExpensesPage() {
 
         {/* Camera View */}
         {showCameraView && (
-          <div className="fixed inset-0 z-50">
-            <CameraCapture
-              onCapture={handleCameraCapture}
-              onClose={() => {
-                setShowCameraView(false);
-                setShowReceiptDialog(false);
-              }}
-            />
-          </div>
+          <CameraCapture
+            onCapture={(file) => {
+              handleCameraCapture(file);
+              setShowCameraView(false);
+            }}
+            onClose={() => {
+              setShowCameraView(false);
+            }}
+          />
         )}
 
         {/* Create Expense Dialog */}
