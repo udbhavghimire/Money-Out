@@ -8,6 +8,7 @@ export function CameraCapture({ onCapture, onClose }) {
   const videoRef = useRef(null);
   const [stream, setStream] = useState(null);
   const [permissionStatus, setPermissionStatus] = useState(null);
+  const [capturedImage, setCapturedImage] = useState(null);
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -70,17 +71,17 @@ export function CameraCapture({ onCapture, onClose }) {
     const context = canvas.getContext("2d");
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     
-    canvas.toBlob((blob) => {
-      const file = new File([blob], "receipt.jpg", { type: "image/jpeg" });
-      onCapture(file);
-    }, "image/jpeg");
+    // Set the captured image data URL
+    setCapturedImage(canvas.toDataURL('image/jpeg'));
   };
 
   const handleRetake = () => {
-    capturePhoto();
+    setCapturedImage(null); // Clear the captured image to show camera view again
   };
 
   const handleUpload = () => {
+    if (!capturedImage) return;
+    
     // Convert data URL to File object
     fetch(capturedImage)
       .then(res => res.blob())

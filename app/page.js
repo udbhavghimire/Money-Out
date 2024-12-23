@@ -433,8 +433,8 @@ export default function ExpensesPage() {
         </div>
 
         {/* Mobile-only bottom upload button */}
-        <div className="fixed bottom-0 left-0 right-0 md:hidden flex items-center justify-center w-screen md:w-[430px] md:left-1/2 md:-translate-x-1/2">
-          <Image
+        <div className="fixed bottom-[80px] left-0 right-0 md:hidden flex items-center justify-center w-screen md:w-[430px] md:left-1/2 md:-translate-x-1/2">
+          {/* <Image
             src="/wave.png"
             alt="Wave Background"
             layout="responsive"
@@ -442,18 +442,27 @@ export default function ExpensesPage() {
             height={4}
             className="pointer-events-none w-full"
             priority
-          />
+          /> */}
           <div
             className="absolute z-10 flex flex-col items-center"
             style={{ transform: "translateY(-10%)" }}
           >
             <button
               onClick={() => setShowReceiptDialog(true)}
-              className="bg-blue-600 rounded-full p-5 shadow-lg transform hover:scale-105 transition-transform duration-200 mb-0.5"
+              className="bg-blue-600 rounded-full p-5
+                shadow-[0_10px_35px_-5px_rgba(59,130,246,0.6),0_4px_15px_-3px_rgba(59,130,246,0.4)] 
+                hover:shadow-[0_20px_45px_-5px_rgba(59,130,246,0.7),0_8px_25px_-5px_rgba(59,130,246,0.5)]
+                transform hover:scale-105 hover:-translate-y-1.5 
+                transition-all duration-300 ease-out mb-0.5
+                relative"
             >
-              <Camera className="h-10 w-10 text-white" />
+              <div className="absolute inset-0 rounded-full bg-blue-400/20 animate-pulse"></div>
+              <Camera className="h-10 w-10 text-white relative z-10" />
             </button>
-            <span className="text-sm font-bold text-gray-700">
+            <span
+              className="text-sm font-bold text-gray-700 
+              drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]"
+            >
               Upload Receipt
             </span>
           </div>

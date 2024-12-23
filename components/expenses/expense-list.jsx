@@ -118,7 +118,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
         className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out
           ${!USE_SLIDE_ANIMATION && expandedExpenseId === expense.id ? 'max-h-[50px] opacity-100' : 'max-h-0 opacity-0'}`}
       >
-        <div className="flex justify-end gap-1 py-2  border-b border-gray-100">
+        <div className="flex justify-start ml-8 py-2  border-b border-gray-100">
           {expense.receipt && (
             <button
               onClick={(e) => {

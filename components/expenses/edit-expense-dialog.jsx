@@ -42,6 +42,7 @@ export function EditExpenseDialog({
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
+    hst: "",
     category: "",
     description: "",
     expense_date: new Date(),
@@ -52,6 +53,7 @@ export function EditExpenseDialog({
       setFormData({
         title: expense.title,
         amount: expense.amount,
+        hst: expense.hst || "",
         category: expense.category,
         description: expense.description || "",
         expense_date: new Date(expense.expense_date),
@@ -111,7 +113,7 @@ export function EditExpenseDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[350px] p-0">
+      <DialogContent className="max-w-[325px] p-0 rounded-lg">
         <div className="flex flex-col items-center py-8">
           <div className="flex flex-col items-center gap-4">
             <div className="text-center mb-6">
@@ -145,20 +147,37 @@ export function EditExpenseDialog({
 
         <form onSubmit={handleSubmit} className="px-8 pb-8">
           <div className="flex flex-col items-center space-y-3 w-full">
-            {/* Amount Input */}
-            <div className="w-full max-w-[280px] relative">
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                $
+            {/* Amount and HST Inputs */}
+            <div className="flex gap-2 w-full max-w-[280px]">
+              {/* Amount Input */}
+              <div className="flex-1">
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="$ Amount"
+                  value={formData.amount}
+                  onChange={(e) =>
+                    setFormData({ ...formData, amount: e.target.value })
+                  }
+                  className="text-center text-lg py-5"
+                  required
+                />
               </div>
-              <Input
-                type="number"
-                step="0.01"
-                placeholder="Enter Amount"
-                value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                className="text-center text-lg py-5 pl-8"
-                required
-              />
+
+              {/* HST Input */}
+              <div className="flex-1">
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="HST Tax"
+                  value={formData.hst}
+                  onChange={(e) =>
+                    setFormData({ ...formData, hst: e.target.value })
+                  }
+                  className="text-center text-lg py-5"
+                  required
+                />
+              </div>
             </div>
 
             {/* Date Picker */}
@@ -170,15 +189,24 @@ export function EditExpenseDialog({
                     {format(formData.expense_date, "dd MMMM, yyyy")}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="center">
-                  <Calendar
-                    mode="single"
-                    selected={formData.expense_date}
-                    onSelect={(date) =>
-                      setFormData({ ...formData, expense_date: date || new Date() })
-                    }
-                    initialFocus
-                  />
+                <PopoverContent 
+                  className="w-auto p-0 z-[60]" 
+                  align="center"
+                  sideOffset={5}
+                >
+                  <div className="bg-white rounded-lg shadow-lg border">
+                    <Calendar
+                      mode="single"
+                      selected={formData.expense_date}
+                      onSelect={(date) =>
+                        setFormData({
+                          ...formData,
+                          expense_date: date || new Date(),
+                        })
+                      }
+                      initialFocus
+                    />
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>

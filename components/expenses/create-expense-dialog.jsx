@@ -14,6 +14,7 @@ import { Calendar as CalendarIcon, Camera, Upload, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "@/lib/axios";
 import { CameraCapture } from "@/components/ui/camera";
+import { ReceiptImages } from "../ReceiptImage";
 
 export function CreateExpenseDialog({
   open,
@@ -23,7 +24,7 @@ export function CreateExpenseDialog({
   initialFile
 }) {
   const [loading, setLoading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [showCamera, setShowCamera] = useState(false);
   const { toast } = useToast();
 
@@ -35,24 +36,35 @@ export function CreateExpenseDialog({
   });
 
   useEffect(() => {
-    if (initialFile) {
-      setSelectedFile(initialFile);
+    if (initialFile && !selectedFiles.includes(initialFile)) {
+      setSelectedFiles(prev => [...prev, initialFile]);
     }
   }, [initialFile]);
 
   const handleFileChange = (e) => {
-    if (e.target.files?.[0]) {
-      setSelectedFile(e.target.files[0]);
-    }
+    const newFiles = Array.from(e.target.files || []);
+    setSelectedFiles(prev => [...prev, ...newFiles]);
   };
 
   const handleCameraCapture = (file) => {
-    setSelectedFile(file);
+    setSelectedFiles(prev => [...prev, file]);
     setShowCamera(false);
   };
 
-  const removeFile = () => {
-    setSelectedFile(null);
+  const removeFile = (index) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddMore = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true; // Allow multiple file selection
+    input.onchange = (e) => {
+      const newFiles = Array.from(e.target.files || []);
+      setSelectedFiles(prev => [...prev, ...newFiles]);
+    };
+    input.click();
   };
 
   const handleSubmit = async (e) => {
@@ -61,19 +73,15 @@ export function CreateExpenseDialog({
 
     try {
       const submitData = new FormData();
-      // Use description as title since it's required by the backend
       submitData.append("title", formData.description);
       submitData.append("amount", parseFloat(formData.amount));
       submitData.append("category", formData.category);
       submitData.append("description", formData.description);
-      submitData.append(
-        "expense_date",
-        format(formData.expense_date, "yyyy-MM-dd")
-      );
+      submitData.append("expense_date", format(formData.expense_date, "yyyy-MM-dd"));
 
-      if (selectedFile) {
-        submitData.append("receipt", selectedFile);
-      }
+      selectedFiles.forEach((file, index) => {
+        submitData.append(`receipt_${index}`, file);
+      });
 
       await axios.post("/api/expenses/", submitData, {
         headers: {
@@ -93,7 +101,7 @@ export function CreateExpenseDialog({
         description: "",
         expense_date: new Date(),
       });
-      setSelectedFile(null);
+      setSelectedFiles([]);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -107,7 +115,7 @@ export function CreateExpenseDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] p-0">
+      <DialogContent className="max-w-[325px] p-0 rounded-lg">
         <div className="flex flex-col items-center py-8">
           <div className="flex flex-col items-center gap-4">
             <div className="text-center mb-6">
@@ -117,25 +125,12 @@ export function CreateExpenseDialog({
               </p>
             </div>
             
-            {/* Selected File Display */}
-            {selectedFile && (
-              <div className="w-full max-w-[280px]">
-                <div className="flex items-center justify-between p-2 border rounded-md">
-                  <span className="text-sm truncate">
-                    {selectedFile.name || "Captured Receipt"}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={removeFile}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
+            <ReceiptImages
+              files={selectedFiles}
+              onRemove={removeFile}
+              onAddMore={handleAddMore}
+              onTakePhoto={() => setShowCamera(true)}
+            />
           </div>
         </div>
         
@@ -148,19 +143,36 @@ export function CreateExpenseDialog({
         ) : (
           <form onSubmit={handleSubmit} className="px-8 pb-8">
             <div className="flex flex-col items-center space-y-3 w-full">
-              {/* Amount Input */}
-              <div className="w-full max-w-[280px]">
-                <Input
-                  type="number"
-                  step="0.01"
-                  placeholder="Enter Amount"
-                  value={formData.amount}
-                  onChange={(e) =>
-                    setFormData({ ...formData, amount: e.target.value })
-                  }
-                  className="text-center text-lg py-5"
-                  required
-                />
+              <div className="flex gap-2 w-full max-w-[280px]">
+                {/* Amount Input */}
+                <div className="flex-1">
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="$ Amount"
+                    value={formData.amount}
+                    onChange={(e) =>
+                      setFormData({ ...formData, amount: e.target.value })
+                    }
+                    className="text-center text-lg py-5"
+                    required
+                  />
+                </div>
+
+                {/* hst taxes */}
+                <div className="flex-1">
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="HST Tax"
+                    value={formData.hst}
+                    onChange={(e) =>
+                      setFormData({ ...formData, hst: e.target.value })
+                    }
+                    className="text-center text-lg py-5"
+                    required
+                  />
+                </div>
               </div>
 
               {/* Date Picker */}
@@ -172,18 +184,24 @@ export function CreateExpenseDialog({
                       {format(formData.expense_date, "dd MMMM, yyyy")}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="center">
-                    <Calendar
-                      mode="single"
-                      selected={formData.expense_date}
-                      onSelect={(date) =>
-                        setFormData({
-                          ...formData,
-                          expense_date: date || new Date(),
-                        })
-                      }
-                      initialFocus
-                    />
+                  <PopoverContent 
+                    className="w-auto p-0 z-[60]" 
+                    align="center"
+                    sideOffset={5}
+                  >
+                    <div className="bg-white rounded-lg shadow-lg border">
+                      <Calendar
+                        mode="single"
+                        selected={formData.expense_date}
+                        onSelect={(date) =>
+                          setFormData({
+                            ...formData,
+                            expense_date: date || new Date(),
+                          })
+                        }
+                        initialFocus
+                      />
+                    </div>
                   </PopoverContent>
                 </Popover>
               </div>
