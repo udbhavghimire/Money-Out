@@ -27,6 +27,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "@/lib/axios";
 import { X, Upload } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function EditExpenseDialog({
   open,
@@ -35,6 +36,7 @@ export function EditExpenseDialog({
   categories,
   onExpenseUpdated,
 }) {
+  const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const { toast } = useToast();
@@ -190,11 +192,23 @@ export function EditExpenseDialog({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent 
-                  className="w-auto p-0 z-[60]" 
-                  align="center"
+                  className="w-auto p-0" 
+                  align={isMobile ? "center" : "start"}
+                  side={isMobile ? "bottom" : "bottom"}
                   sideOffset={5}
+                  style={{
+                    zIndex: 9999,
+                    position: 'relative',
+                    ...(isMobile && {
+                      position: 'fixed',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      maxWidth: '90vw'
+                    })
+                  }}
                 >
-                  <div className="bg-white rounded-lg shadow-lg border">
+                  <div className={`bg-white rounded-lg shadow-lg border ${isMobile ? 'max-w-[90vw]' : ''}`}>
                     <Calendar
                       mode="single"
                       selected={formData.expense_date}
@@ -205,6 +219,7 @@ export function EditExpenseDialog({
                         })
                       }
                       initialFocus
+                      className={isMobile ? 'w-full' : ''}
                     />
                   </div>
                 </PopoverContent>
