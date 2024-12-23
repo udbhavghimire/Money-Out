@@ -111,7 +111,7 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
               <Label className="text-sm font-medium mb-2 block">
                 Select date range
               </Label>
-              <div className="flex gap-3">
+              <div className="flex ">
                 <div className="flex-1">
                   <label className="text-xs text-gray-500 mb-1 block">
                     From
@@ -119,7 +119,7 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
                   <Input
                     type="date"
                     placeholder="yyyy-MM-dd"
-                    className="w-full rounded-lg border border-gray-300 p-4 text-sm placeholder:text-gray-400"
+                    className="w-full rounded-lg border border-gray-300 p-5 text-sm placeholder:text-gray-400"
                     value={dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : ""}
                     onChange={(e) => 
                       setDateRange(prev => ({ ...prev, from: new Date(e.target.value) }))
@@ -133,7 +133,7 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
                   <Input
                     type="date"
                     placeholder="yyyy-MM-dd"
-                    className="w-full rounded-lg border border-gray-300 p-4 text-sm placeholder:text-gray-400"
+                    className="w-full rounded-lg border border-gray-300 p-5 text-sm placeholder:text-gray-400"
                     value={dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : ""}
                     onChange={(e) => 
                       setDateRange(prev => ({ ...prev, to: new Date(e.target.value) }))

@@ -115,7 +115,7 @@ export function CreateExpenseDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[325px] p-0 rounded-lg">
+      <DialogContent className="max-w-[350px] p-0 rounded-lg">
         <div className="flex flex-col items-center py-8">
           <div className="flex flex-col items-center gap-4">
             <div className="text-center mb-6">
