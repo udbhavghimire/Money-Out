@@ -170,7 +170,6 @@ export function CreateExpenseDialog({
                       setFormData({ ...formData, hst: e.target.value })
                     }
                     className="text-center text-lg py-5"
-                    required
                   />
                 </div>
               </div>
@@ -209,6 +208,7 @@ export function CreateExpenseDialog({
                         initialFocus
                         disabled={false}
                         className="rounded-md"
+                        closeOnSelect={true}
                       />
                     </div>
                   </PopoverContent>

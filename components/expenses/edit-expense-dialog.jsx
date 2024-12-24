@@ -113,8 +113,8 @@ export function EditExpenseDialog({
       Object.keys(formData).forEach((key) => {
         if (key === "expense_date") {
           submitData.append(key, format(formData[key], "yyyy-MM-dd"));
-        } else if (key === "amount") {
-          submitData.append(key, parseFloat(formData[key]));
+        } else if (key === "amount" || key === "hst") {
+          submitData.append(key, parseFloat(formData[key] || 0));
         } else {
           submitData.append(key, formData[key]);
         }
@@ -124,11 +124,15 @@ export function EditExpenseDialog({
         submitData.append("receipt", selectedFile);
       }
 
-      await axios.patch(`/api/expenses/${expense.id}/`, submitData, {
+      const response = await axios.patch(`/api/expenses/${expense.id}/`, submitData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      if (response.data.receipt) {
+        expense.receipt = response.data.receipt;
+      }
 
       toast({
         title: "Success",
@@ -208,7 +212,6 @@ export function EditExpenseDialog({
                   onChange={(e) =>
                     setFormData({ ...formData, hst: e.target.value })
                   }
-                  required
                 />
               </div>
             </div>
@@ -247,6 +250,7 @@ export function EditExpenseDialog({
                       initialFocus
                       disabled={false}
                       className="rounded-md"
+                      closeOnSelect={true}
                     />
                   </div>
                 </PopoverContent>
