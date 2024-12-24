@@ -29,6 +29,41 @@ import axios from "@/lib/axios";
 import { X, Upload } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
+const FloatingLabelInput = ({ label, value, onChange, type = "text", className = "", ...props }) => {
+  return (
+    <div className="relative">
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        className={`peer w-full border rounded-md px-3 pt-6 pb-2 text-gray-900 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-green-500 ${className}`}
+        placeholder={label}
+        {...props}
+      />
+      <label className="absolute left-3 top-1 text-xs text-gray-500 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:top-1 peer-focus:text-xs">
+        {label}
+      </label>
+    </div>
+  );
+};
+
+const FloatingLabelTextarea = ({ label, value, onChange, className = "", ...props }) => {
+  return (
+    <div className="relative">
+      <textarea
+        value={value}
+        onChange={onChange}
+        className={`peer w-full border rounded-md px-3 pt-6 pb-2 text-gray-900 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-green-500 min-h-[80px] ${className}`}
+        placeholder={label}
+        {...props}
+      />
+      <label className="absolute left-3 top-1 text-xs text-gray-500 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:top-1 peer-focus:text-xs">
+        {label}
+      </label>
+    </div>
+  );
+};
+
 export function EditExpenseDialog({
   open,
   onOpenChange,
@@ -151,32 +186,28 @@ export function EditExpenseDialog({
           <div className="flex flex-col items-center space-y-3 w-full">
             {/* Amount and HST Inputs */}
             <div className="flex gap-2 w-full max-w-[280px]">
-              {/* Amount Input */}
               <div className="flex-1">
-                <Input
+                <FloatingLabelInput
                   type="number"
                   step="0.01"
-                  placeholder="$ Amount"
+                  label="Amount ($)"
                   value={formData.amount}
                   onChange={(e) =>
                     setFormData({ ...formData, amount: e.target.value })
                   }
-                  className="text-center text-lg py-5"
                   required
                 />
               </div>
 
-              {/* HST Input */}
               <div className="flex-1">
-                <Input
+                <FloatingLabelInput
                   type="number"
                   step="0.01"
-                  placeholder="HST Tax"
+                  label="HST Tax"
                   value={formData.hst}
                   onChange={(e) =>
                     setFormData({ ...formData, hst: e.target.value })
                   }
-                  className="text-center text-lg py-5"
                   required
                 />
               </div>
@@ -184,57 +215,61 @@ export function EditExpenseDialog({
 
             {/* Date Picker */}
             <div className="w-full max-w-[280px]">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-center py-5">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {format(formData.expense_date, "dd MMMM, yyyy")}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent 
-                  className="w-auto p-0" 
-                  align={isMobile ? "center" : "start"}
-                  side={isMobile ? "bottom" : "bottom"}
-                  sideOffset={5}
-                  style={{
-                    zIndex: 9999,
-                    position: 'relative',
-                    ...(isMobile && {
-                      position: 'fixed',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      maxWidth: '90vw'
-                    })
-                  }}
-                >
-                  <div className={`bg-white rounded-lg shadow-lg border ${isMobile ? 'max-w-[90vw]' : ''}`}>
-                    <Calendar
-                      mode="single"
-                      selected={formData.expense_date}
-                      onSelect={(date) =>
-                        setFormData({
-                          ...formData,
-                          expense_date: date || new Date(),
-                        })
-                      }
-                      initialFocus
-                      className={isMobile ? 'w-full' : ''}
-                    />
-                  </div>
-                </PopoverContent>
-              </Popover>
+              <div className="relative">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start pt-10 pb-6 h-[55px] px-3">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {format(formData.expense_date, "dd MMMM, yyyy")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent 
+                    className="w-auto p-0" 
+                    align={isMobile ? "center" : "start"}
+                    side={isMobile ? "bottom" : "bottom"}
+                    sideOffset={5}
+                    style={{
+                      zIndex: 9999,
+                      position: 'relative',
+                      ...(isMobile && {
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        maxWidth: '90vw'
+                      })
+                    }}
+                  >
+                    <div className={`bg-white rounded-lg shadow-lg border ${isMobile ? 'max-w-[90vw]' : ''}`}>
+                      <Calendar
+                        mode="single"
+                        selected={formData.expense_date}
+                        onSelect={(date) =>
+                          setFormData({
+                            ...formData,
+                            expense_date: date || new Date(),
+                          })
+                        }
+                        initialFocus
+                        className={isMobile ? 'w-full' : ''}
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                <label className="absolute left-3 top-1 text-xs text-gray-500 pb-10">
+                  Date
+                </label>
+              </div>
             </div>
 
             {/* Notes (previously description) */}
             <div className="w-full max-w-[280px]">
-              <Textarea
-                placeholder="Notes"
+              <FloatingLabelTextarea
+                label="Notes"
                 value={formData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="min-h-[80px]"
                 required
               />
             </div>

@@ -623,3 +623,11 @@
   max-height: calc(100vh - 2rem);
   overflow-y: auto;
 }
+
+.popover-content {
+  z-index: 1000;
+}
+
+[data-radix-popper-content-wrapper] {
+  z-index: 1000 !important;
+}

@@ -179,15 +179,22 @@ export function CreateExpenseDialog({
               <div className="w-full max-w-[280px]">
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-center py-5">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-center py-5"
+                      type="button"
+                    >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {format(formData.expense_date, "dd MMMM, yyyy")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent 
-                    className="w-auto p-0 z-[60]" 
+                    className="w-auto p-0" 
                     align="center"
                     sideOffset={5}
+                    onInteractOutside={(e) => {
+                      e.preventDefault();
+                    }}
                   >
                     <div className="bg-white rounded-lg shadow-lg border">
                       <Calendar
@@ -200,6 +207,8 @@ export function CreateExpenseDialog({
                           })
                         }
                         initialFocus
+                        disabled={false}
+                        className="rounded-md"
                       />
                     </div>
                   </PopoverContent>
