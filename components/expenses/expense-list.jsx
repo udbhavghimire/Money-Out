@@ -74,7 +74,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
     <div key={expense.id} className="relative expense-item">
       {/* Main expense item */}
       <div 
-        className={`py-1.5 pr-4 flex justify-between items-start border-b border-gray-100 cursor-pointer transition-all
+        className={`py-1.5  flex justify-between items-start border-b border-gray-100 cursor-pointer transition-all
           ${expandedExpenseId === expense.id ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
         onClick={(e) => {
           e.stopPropagation();
@@ -97,8 +97,8 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
               />
             </svg>
           </div>
-          <div>
-            <h3 className="text-xs font-medium text-gray-900 leading-none">{expense.title}</h3>
+          <div className="w-full">
+            <h3 className="text-xs font-medium text-gray-900 leading-none md:mr-0 mr-10">{expense.title}</h3>
             <p className="text-[10px] text-gray-500 mt-0.5 leading-none">
               {format(new Date(expense.expense_date), "MMM dd, yyyy")}
             </p>
@@ -289,7 +289,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
 
   return (
     <>
-      <div className="divide-y divide-gray-100 mb-16">
+      <div className="divide-y divide-gray-100 mb-16 md:mb-0 h-[60vh] md:h-auto overflow-y-auto">
         {/* Today's Expenses */}
         {groupedExpenses.today.length > 0 && (
           <div className="py-1">

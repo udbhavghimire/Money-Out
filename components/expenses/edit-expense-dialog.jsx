@@ -215,51 +215,42 @@ export function EditExpenseDialog({
 
             {/* Date Picker */}
             <div className="w-full max-w-[280px]">
-              <div className="relative">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start pt-10 pb-6 h-[55px] px-3">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {format(formData.expense_date, "dd MMMM, yyyy")}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent 
-                    className="w-auto p-0" 
-                    align={isMobile ? "center" : "start"}
-                    side={isMobile ? "bottom" : "bottom"}
-                    sideOffset={5}
-                    style={{
-                      zIndex: 9999,
-                      position: 'relative',
-                      ...(isMobile && {
-                        position: 'fixed',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        maxWidth: '90vw'
-                      })
-                    }}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-center py-5"
+                    type="button"
                   >
-                    <div className={`bg-white rounded-lg shadow-lg border ${isMobile ? 'max-w-[90vw]' : ''}`}>
-                      <Calendar
-                        mode="single"
-                        selected={formData.expense_date}
-                        onSelect={(date) =>
-                          setFormData({
-                            ...formData,
-                            expense_date: date || new Date(),
-                          })
-                        }
-                        initialFocus
-                        className={isMobile ? 'w-full' : ''}
-                      />
-                    </div>
-                  </PopoverContent>
-                </Popover>
-                <label className="absolute left-3 top-1 text-xs text-gray-500 pb-10">
-                  Date
-                </label>
-              </div>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {format(formData.expense_date, "dd MMMM, yyyy")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="w-auto p-0" 
+                  align="center"
+                  sideOffset={5}
+                  onInteractOutside={(e) => {
+                    e.preventDefault();
+                  }}
+                >
+                  <div className="bg-white rounded-lg shadow-lg border">
+                    <Calendar
+                      mode="single"
+                      selected={formData.expense_date}
+                      onSelect={(date) =>
+                        setFormData({
+                          ...formData,
+                          expense_date: date || new Date(),
+                        })
+                      }
+                      initialFocus
+                      disabled={false}
+                      className="rounded-md"
+                    />
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
 
             {/* Notes (previously description) */}
