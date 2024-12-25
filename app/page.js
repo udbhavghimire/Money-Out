@@ -277,7 +277,7 @@ export default function ExpensesPage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden">
-      {/* Background Container - Updated with desktop styles */}
+      {/* Background Container */}
       <div
         className="fixed inset-0 -z-10 w-full md:w-[100%] md:left-0 md:translate-x-0 md:bg-gray-50"
         style={{
@@ -292,48 +292,53 @@ export default function ExpensesPage() {
         }}
       />
 
-      {/* Mobile Stats Section */}
-      <div className="p-5 px-6 block md:hidden">
-        <div className="">
-          <Image
-            src="/money-out-logo.png"
-            alt="Money Out"
-            width={70}
-            height={22}
-            className=""
+      {/* Only show StatsMobile when camera is not active */}
+      {!showCameraView && (
+        <>
+          <div className="p-5 px-6 block md:hidden">
+            <div className="">
+              <Image
+                src="/money-out-logo.png"
+                alt="Money Out"
+                width={70}
+                height={22}
+                className=""
+              />
+            </div>
+          </div>
+          <StatsMobile
+            summary={{
+              stats: getFilteredStats(),
+            }}
+            setShowFilterDialog={() => setShowFilterDialog(true)}
+            setShowExportDialog={() => setShowExportDialog(true)}
+            categories={categories}
+            selectedCategoryFilter={selectedCategoryFilter}
+            setSelectedCategoryFilter={setSelectedCategoryFilter}
+            isDialogOpen={showReceiptDialog || showExpenseDialog}
           />
-        </div>
-      </div>
-      <StatsMobile
-        summary={{
-          stats: getFilteredStats(),
-        }}
-        setShowFilterDialog={() => setShowFilterDialog(true)}
-        setShowExportDialog={() => setShowExportDialog(true)}
-        categories={categories}
-        selectedCategoryFilter={selectedCategoryFilter}
-        setSelectedCategoryFilter={setSelectedCategoryFilter}
-      />
 
-      {/* Selected Filter Mobile */}
-      <div className="py-3 px-5 md:hidden">
-        <SelectedFilter
-          activeFilters={activeFilters}
-          categories={categories}
-          handleFilter={handleFilter}
-          setShowFilterDialog={setShowFilterDialog}
-        />
-      </div>
+          {/* Selected Filter Mobile */}
+          <div className="py-3 px-5 md:hidden">
+            <SelectedFilter
+              activeFilters={activeFilters}
+              categories={categories}
+              handleFilter={handleFilter}
+              setShowFilterDialog={setShowFilterDialog}
+            />
+          </div>
 
-      {/* Mobile Search Section */}
-      <SearchMobile
-        activeFilters={activeFilters}
-        categories={categories}
-        handleFilter={handleFilter}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        setShowFilterDialog={setShowFilterDialog}
-      />
+          {/* Mobile Search Section */}
+          <SearchMobile
+            activeFilters={activeFilters}
+            categories={categories}
+            handleFilter={handleFilter}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            setShowFilterDialog={setShowFilterDialog}
+          />
+        </>
+      )}
 
       {/* Content Container - Updated with desktop layout */}
       <div className="relative z-10 w-full max-w-[430px] mx-auto px-4 md:max-w-none md:px-0">
