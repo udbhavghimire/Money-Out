@@ -43,7 +43,10 @@ export function CreateExpenseDialog({
 
   const handleFileChange = (e) => {
     const newFiles = Array.from(e.target.files || []);
-    setSelectedFiles(prev => [...prev, ...newFiles]);
+    setSelectedFiles(prev => {
+      const combined = [...prev, ...newFiles];
+      return combined.slice(0, 4); // Limit to 4 files
+    });
   };
 
   const handleCameraCapture = (file) => {
@@ -56,13 +59,25 @@ export function CreateExpenseDialog({
   };
 
   const handleAddMore = () => {
+    if (selectedFiles.length >= 4) {
+      toast({
+        variant: "destructive",
+        title: "Maximum files reached",
+        description: "You can only upload up to 4 receipt images.",
+      });
+      return;
+    }
+
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
-    input.multiple = true; // Allow multiple file selection
+    input.multiple = true;
     input.onchange = (e) => {
       const newFiles = Array.from(e.target.files || []);
-      setSelectedFiles(prev => [...prev, ...newFiles]);
+      setSelectedFiles(prev => {
+        const combined = [...prev, ...newFiles];
+        return combined.slice(0, 4); // Limit to 4 files
+      });
     };
     input.click();
   };
@@ -79,8 +94,12 @@ export function CreateExpenseDialog({
       submitData.append("description", formData.description);
       submitData.append("expense_date", format(formData.expense_date, "yyyy-MM-dd"));
 
+      // Append each receipt with its corresponding field name
       selectedFiles.forEach((file, index) => {
-        submitData.append(`receipt_${index}`, file);
+        if (index === 0) submitData.append("receipt", file);
+        else if (index === 1) submitData.append("receipt2", file);
+        else if (index === 2) submitData.append("receipt3", file);
+        else if (index === 3) submitData.append("receipt4", file);
       });
 
       await axios.post("/api/expenses/", submitData, {

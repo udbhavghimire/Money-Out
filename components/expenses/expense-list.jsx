@@ -4,7 +4,7 @@ import { format, isToday, isYesterday, isThisWeek, parseISO } from "date-fns";
 import axios from "@/lib/axios";
 import { useToast } from "@/hooks/use-toast";
 import { EditExpenseDialog } from "./edit-expense-dialog";
-import { Receipt, X } from "lucide-react";
+import { Receipt, X, ChevronRight, ChevronLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { CalendarIcon } from "lucide-react";
 import Image from "next/image";
@@ -30,6 +30,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
   const [receiptModalOpen, setReceiptModalOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Group expenses by time period and specific dates
   const groupedExpenses = expenses.reduce((groups, expense) => {
@@ -48,9 +49,9 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
     return groups;
   }, { today: [], yesterday: [], byDate: {} });
 
-  const handleReceiptClick = (e, receiptUrl) => {
+  const handleReceiptClick = (e, expense) => {
     e.stopPropagation();
-    setSelectedReceipt(receiptUrl);
+    setSelectedReceipt(expense);
     setReceiptModalOpen(true);
   };
 
@@ -119,16 +120,17 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
           ${!USE_SLIDE_ANIMATION && expandedExpenseId === expense.id ? 'max-h-[50px] opacity-100' : 'max-h-0 opacity-0'}`}
       >
         <div className="flex justify-start ml-8 py-2  border-b border-gray-100">
-          {expense.receipt && (
+          {(expense.receipt || expense.receipt2 || expense.receipt3 || expense.receipt4) && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleReceiptClick(e, expense.receipt);
+                setCurrentImageIndex(0);
+                handleReceiptClick(e, expense);
               }}
               className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
             >
               <Receipt className="h-4 w-4 text-blue-500" />
-              <span className="sr-only">View Receipt</span>
+              <span className="sr-only">View Receipts</span>
             </button>
           )}
           <button
@@ -187,11 +189,12 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
             ${expandedExpenseId === expense.id ? 'translate-x-0' : 'translate-x-full'}`}
         >
           <div className="flex items-center gap-0">
-            {expense.receipt && (
+            {(expense.receipt || expense.receipt2 || expense.receipt3 || expense.receipt4) && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleReceiptClick(e, expense.receipt);
+                  setCurrentImageIndex(0);
+                  handleReceiptClick(e, expense);
                 }}
                 className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
               >
@@ -287,6 +290,30 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
     setEditingExpense(expense);
   };
 
+  const getReceiptUrl = (expense, index) => {
+    const receipts = [
+      expense.receipt,
+      expense.receipt2,
+      expense.receipt3,
+      expense.receipt4
+    ].filter(Boolean);
+    return receipts[index];
+  };
+
+  const countImages = (expense) => {
+    return [
+      expense.receipt,
+      expense.receipt2,
+      expense.receipt3,
+      expense.receipt4
+    ].filter(Boolean).length;
+  };
+
+  const hasNextImage = (expense, currentIndex) => {
+    const totalImages = countImages(expense);
+    return currentIndex < totalImages - 1;
+  };
+
   return (
     <>
       <div className="divide-y divide-gray-100 mb-16 md:mb-0 h-[60vh] md:h-auto overflow-y-auto">
@@ -326,19 +353,54 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
         open={receiptModalOpen} 
         onOpenChange={(open) => {
           setReceiptModalOpen(open);
-          // Don't affect expandedExpenseId
+          if (!open) {
+            setCurrentImageIndex(0);
+          }
         }}
       >
         <DialogContent className="max-w-[320px] rounded-2xl">
           {selectedReceipt && (
-            <div className="relative w-full aspect-[2/3]">
-              <Image
-                src={selectedReceipt}
-                alt="Receipt"
-                fill
-                sizes="(max-width: 768px) 100vw, 80vw"
-                className="object-fit rounded-lg px-5"
-              />
+            <div className="relative">
+              {/* Image container */}
+              <div className="relative w-full aspect-[2/3]">
+                <Image
+                  src={getReceiptUrl(selectedReceipt, currentImageIndex)}
+                  alt={`Receipt ${currentImageIndex + 1}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 80vw"
+                  className="object-contain rounded-lg"
+                />
+              </div>
+
+              {/* Navigation arrows - Updated logic */}
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2">
+                {currentImageIndex > 0 && (
+                  <button
+                    onClick={() => setCurrentImageIndex(prev => prev - 1)}
+                    className="p-1 rounded-full bg-white/80 hover:bg-white shadow-md"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                )}
+                {/* Show right arrow if there are more images, regardless of current index */}
+                {countImages(selectedReceipt) > 1 && currentImageIndex < countImages(selectedReceipt) - 1 && (
+                  <div className={`${currentImageIndex === 0 ? 'ml-auto' : ''}`}>
+                    <button
+                      onClick={() => setCurrentImageIndex(prev => prev + 1)}
+                      className="p-1 rounded-full bg-white/80 hover:bg-white shadow-md"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Image counter */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+                <div className="bg-black/50 text-white px-2 py-1 rounded-full text-xs">
+                  {currentImageIndex + 1} / {countImages(selectedReceipt)}
+                </div>
+              </div>
             </div>
           )}
         </DialogContent>

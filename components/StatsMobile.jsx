@@ -1,13 +1,38 @@
-import { SlidersHorizontal, Download } from "lucide-react";
+import { SlidersHorizontal, Download, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from 'react';
 
-export function StatsMobile({ summary, setShowFilterDialog, setShowExportDialog }) {
+export function StatsMobile({ 
+  summary, 
+  setShowFilterDialog, 
+  setShowExportDialog,
+  categories,
+  selectedCategoryFilter,
+  setSelectedCategoryFilter 
+}) {
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowCategoryDropdown(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="md:hidden px-3">
+    <div className="md:hidden">
       {/* Stats and Filter Section */}
-      <div className="sticky top-0 z-10">
-        <div className="">
-          <div className="flex justify-start items-center">
-            <div className="flex items-center gap-6 bg-[#fff6d3] shadow-sm rounded-3xl pl-3 pr-12 py-3 ml-4">
+      <div className="sticky top-0 z-[99997] p-5">
+        <div className="flex items-center justify-between gap-2">
+          {/* Stats with Dropdown Section */}
+          <div className="relative flex items-center" ref={dropdownRef}>
+            <div className="flex items-center gap-6 bg-[#fff6d3] shadow-sm rounded-3xl pl-3 pr-4 py-3">
               <div className="text-center">
                 <p className="text-[10px] font-medium text-gray-900">
                   $
@@ -44,34 +69,82 @@ export function StatsMobile({ summary, setShowFilterDialog, setShowExportDialog 
                   THIS YEAR
                 </p>
               </div>
-            </div>
-            {/* Filter and Export Buttons */}
-            <div className="flex items-center gap-4 mx-5">
+              
+              {/* Category Dropdown Trigger */}
               <button
-                className="flex flex-col items-center"
-                onClick={setShowFilterDialog}
+                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                className="ml-2"
               >
-                <SlidersHorizontal
-                  className="h-4 w-4 text-gray-900"
-                  strokeWidth={2.5}
-                />
-                <span className="text-[8px] uppercase font-medium text-gray-900 mt-0.5">
-                  FILTER
-                </span>
-              </button>
-              <button
-                className="flex flex-col items-center"
-                onClick={setShowExportDialog}
-              >
-                <Download
-                  className="h-4 w-4 text-gray-900"
-                  strokeWidth={2.5}
-                />
-                <span className="text-[8px] uppercase font-medium text-gray-900 mt-0.5">
-                  EXPORT
-                </span>
+                <ChevronDown className="h-4 w-4 text-gray-500" />
               </button>
             </div>
+
+            
+
+            {/* Dropdown Menu */}
+            {showCategoryDropdown && (
+              <div className="fixed right-[100px] top-[150px] mx-4 bg-white rounded-lg shadow-xl py-1 z-[999999] max-w-[200px]">
+                <div className=" overflow-y-auto">
+                  <div className="py-2">
+                    <button
+                      className={`max-w-[200px] px-4 py-3 text-left text-sm hover:bg-gray-50 ${
+                        selectedCategoryFilter === "all" ? "text-blue-600 font-medium" : ""
+                      }`}
+                      onClick={() => {
+                        setSelectedCategoryFilter("all");
+                        setShowCategoryDropdown(false);
+                      }}
+                    >
+                      All Expenses
+                    </button>
+                    {categories.map((category) => (
+                      <button
+                        key={category.id}
+                        className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-50 ${
+                          selectedCategoryFilter === category.id.toString()
+                            ? "text-blue-600 font-medium"
+                            : ""
+                        }`}
+                        onClick={() => {
+                          setSelectedCategoryFilter(category.id.toString());
+                          setShowCategoryDropdown(false);
+                        }}
+                      >
+                        {category.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Filter and Export Buttons */}
+          <div className="flex items-center gap-4">
+            <button
+              className="flex flex-col items-center"
+              onClick={setShowFilterDialog}
+            >
+              <SlidersHorizontal
+                className="h-4 w-4 text-gray-900"
+                strokeWidth={2.5}
+              />
+              <span className="text-[8px] uppercase font-medium text-gray-900 mt-0.5">
+                FILTER
+              </span>
+            </button>
+            <button
+              className="flex flex-col items-center"
+              onClick={setShowExportDialog}
+            >
+              <Download
+                className="h-4 w-4 text-gray-900"
+                strokeWidth={2.5}
+              />
+              <span className="text-[8px] uppercase font-medium text-gray-900 mt-0.5">
+                EXPORT
+              </span>
+            </button>
           </div>
         </div>
       </div>

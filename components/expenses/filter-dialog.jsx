@@ -77,12 +77,12 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[90%] h-auto max-h-[85vh] bg-white rounded-lg p-0 max-w-[350px]">
+      <DialogContent className=" fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[90%] h-auto max-h-[85vh] bg-white rounded-lg p-0 max-w-[350px]">
         <DialogHeader className="p-4 border-b">
           <DialogTitle className="text-lg font-semibold text-center">Filter Expenses</DialogTitle>
         </DialogHeader>
 
-        <div className="py-2 px-4">
+        <div className="py-2 mx-2">
           <div className="space-y-5 text-center">
             <div className="">
               <Label className="text-sm font-medium mb-3 block">
@@ -111,7 +111,7 @@ export function FilterDialog({ open, onOpenChange, categories, onFilter, activeF
               <Label className="text-sm font-medium mb-2 block">
                 Select date range
               </Label>
-              <div className="flex ">
+              <div className="flex gap-1">
                 <div className="flex-1">
                   <label className="text-xs text-gray-500 mb-1 block">
                     From

@@ -78,6 +78,7 @@ export default function ExpensesPage() {
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [showFullImage, setShowFullImage] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
 
   useEffect(() => {
     // Redirect to signin if not authenticated
@@ -245,6 +246,35 @@ export default function ExpensesPage() {
     return `$${amount.toFixed(2)}`;
   };
 
+  const getFilteredStats = () => {
+    if (selectedCategoryFilter === "all") {
+      return summary.stats || { week: 0, month: 0, year: 0 };
+    }
+
+    // Filter expenses by selected category
+    const filteredExpenses = expenses.filter(
+      (expense) => expense.category.toString() === selectedCategoryFilter
+    );
+
+    // Calculate stats for filtered expenses
+    const now = new Date();
+    const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const yearStart = new Date(now.getFullYear(), 0, 1);
+
+    return {
+      week: filteredExpenses
+        .filter((e) => new Date(e.expense_date) >= weekStart)
+        .reduce((sum, e) => sum + e.amount, 0),
+      month: filteredExpenses
+        .filter((e) => new Date(e.expense_date) >= monthStart)
+        .reduce((sum, e) => sum + e.amount, 0),
+      year: filteredExpenses
+        .filter((e) => new Date(e.expense_date) >= yearStart)
+        .reduce((sum, e) => sum + e.amount, 0),
+    };
+  };
+
   return (
     <div className="min-h-screen overflow-x-hidden">
       {/* Background Container - Updated with desktop styles */}
@@ -275,9 +305,14 @@ export default function ExpensesPage() {
         </div>
       </div>
       <StatsMobile
-        summary={summary}
+        summary={{
+          stats: getFilteredStats(),
+        }}
         setShowFilterDialog={() => setShowFilterDialog(true)}
         setShowExportDialog={() => setShowExportDialog(true)}
+        categories={categories}
+        selectedCategoryFilter={selectedCategoryFilter}
+        setSelectedCategoryFilter={setSelectedCategoryFilter}
       />
 
       {/* Selected Filter Mobile */}
@@ -328,37 +363,58 @@ export default function ExpensesPage() {
             {/* Stats and Filters Section */}
             <div className="hidden md:block mb-6 border-b pb-6">
               <div className="flex justify-between items-start">
-                {/* Stats Section */}
-                <div className="flex gap-8">
-                  <div>
-                    <p className="text-sm text-gray-500">This Week</p>
-                    <p className="text-md font-bold">
-                      $
-                      {(summary.stats?.week || 0).toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">This Month</p>
-                    <p className="text-md font-bold">
-                      $
-                      {(summary.stats?.month || 0).toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">This Year</p>
-                    <p className="text-md font-bold">
-                      $
-                      {(summary.stats?.year || 0).toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </p>
+                <div>
+                  <div className="flex gap-8">
+                    <div>
+                      <p className="text-sm text-gray-500">This Week</p>
+                      <p className="text-md font-bold">
+                        $
+                        {getFilteredStats().week.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">This Month</p>
+                      <p className="text-md font-bold">
+                        $
+                        {getFilteredStats().month.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">This Year</p>
+                      <p className="text-md font-bold">
+                        $
+                        {getFilteredStats().year.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                    </div>
+                    {/* Stats Section with Category Filter */}
+                    <div className="flex items-center gap-4 mb-4">
+                      <select
+                        value={selectedCategoryFilter}
+                        onChange={(e) =>
+                          setSelectedCategoryFilter(e.target.value)
+                        }
+                        className="border rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      >
+                        <option value="all">All Expenses</option>
+                        {categories.map((category) => (
+                          <option
+                            key={category.id}
+                            value={category.id.toString()}
+                          >
+                            {category.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
 
@@ -373,6 +429,14 @@ export default function ExpensesPage() {
                     Filter Expenses
                   </Button>
 
+                  {/* Desktop Upload Button */}
+                  <Button
+                    className="md:flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+                    onClick={() => setShowReceiptDialog(true)}
+                  >
+                    <Upload className="h-4 w-4" />
+                    Upload Receipt
+                  </Button>
                   <Button
                     className="justify-start"
                     variant="outline"
@@ -395,6 +459,12 @@ export default function ExpensesPage() {
               />
             </div>
 
+            <div className="md:block hidden">
+              <h2 className="text-blue-600 text-base font-semibold mb-2">
+                EXPENSE HISTORY
+              </h2>
+            </div>
+
             {/* Search and Upload Section */}
             <div className="md:flex md:justify-between md:items-center md:mb-6 hidden mt-6">
               <div className="relative md:w-96">
@@ -407,15 +477,6 @@ export default function ExpensesPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-
-              {/* Desktop Upload Button */}
-              <Button
-                className="md:flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
-                onClick={() => setShowReceiptDialog(true)}
-              >
-                <Upload className="h-4 w-4" />
-                Upload Receipt
-              </Button>
             </div>
 
             {/* Expense List */}
