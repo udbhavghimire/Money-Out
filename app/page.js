@@ -494,7 +494,7 @@ export default function ExpensesPage() {
         </div>
 
         {/* Mobile-only bottom upload button */}
-        <div className="fixed bottom-[80px] left-0 right-0 md:hidden flex items-center justify-center w-screen md:w-[430px] md:left-1/2 md:-translate-x-1/2">
+        <div className="fixed  bottom-[80px] left-0 right-0 md:hidden flex items-center justify-center w-screen md:w-[430px] md:left-1/2 md:-translate-x-1/2 ">
           {/* <Image
             src="/wave.png"
             alt="Wave Background"
@@ -505,7 +505,7 @@ export default function ExpensesPage() {
             priority
           /> */}
           <div
-            className="absolute z-10 flex flex-col items-center"
+            className="absolute  flex flex-col items-center"
             style={{ transform: "translateY(-10%)" }}
           >
             <button
@@ -532,7 +532,7 @@ export default function ExpensesPage() {
         {/* Receipt Upload Dialog */}
         {showReceiptDialog && !showCameraView && (
           <div
-            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/70 flex items-center justify-center p-4"
             onClick={() => setShowReceiptDialog(false)}
           >
             <div
@@ -548,7 +548,7 @@ export default function ExpensesPage() {
                 <X className="h-4 w-4" />
               </Button>
 
-              <div className="p-8">
+              <div className="p-8 z-[1000]">
                 {/* Icon and Title */}
                 <div className="text-center mb-8">
                   <div className="flex justify-center mb-6">

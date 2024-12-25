@@ -28,10 +28,10 @@ export function StatsMobile({
   return (
     <div className="md:hidden">
       {/* Stats and Filter Section */}
-      <div className="sticky top-0 z-[99997] p-5">
+      <div className="sticky top-0 z-[50] p-5">
         <div className="flex items-center justify-between gap-2">
           {/* Stats with Dropdown Section */}
-          <div className="relative flex items-center" ref={dropdownRef}>
+          <div className="relative flex items-center z-[110]" ref={dropdownRef}>
             <div className="flex items-center gap-6 bg-[#fff6d3] shadow-sm rounded-3xl pl-3 pr-4 py-3">
               <div className="text-center">
                 <p className="text-[10px] font-medium text-gray-900">
@@ -83,7 +83,7 @@ export function StatsMobile({
 
             {/* Dropdown Menu */}
             {showCategoryDropdown && (
-              <div className="fixed right-[100px] top-[150px] mx-4 bg-white rounded-lg shadow-xl py-1 z-[999999] max-w-[200px]">
+              <div className="fixed right-[100px] top-[150px] mx-4 bg-white rounded-lg shadow-xl py-1 z-[110] max-w-[200px]">
                 <div className=" overflow-y-auto">
                   <div className="py-2">
                     <button

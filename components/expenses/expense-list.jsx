@@ -19,6 +19,8 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 // Add this constant at the top of the file to easily switch between modes
 const USE_SLIDE_ANIMATION = false; // Set to true for slide animation, false for expansion
@@ -31,6 +33,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [dateFilter, setDateFilter] = useState(null);
 
   // Group expenses by time period and specific dates
   const groupedExpenses = expenses.reduce((groups, expense) => {
@@ -314,9 +317,35 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
     return currentIndex < totalImages - 1;
   };
 
+  const datePickerWrapperStyles = {
+    width: '100%',
+    position: 'relative',
+  };
+
+  const datePickerStyles = {
+    width: '100%',
+    padding: '8px 12px',
+    border: '1px solid #e2e8f0',
+    borderRadius: '6px',
+    fontSize: '14px',
+    backgroundColor: 'white',
+  };
+
+  const CustomDatePickerInput = ({ value, onClick }) => (
+    <button
+      className="w-full flex items-center justify-between px-3 py-2 text-sm border rounded-lg hover:bg-gray-50"
+      onClick={onClick}
+    >
+      <span className="flex items-center">
+        <CalendarIcon className="w-4 h-4 mr-2 text-gray-500" />
+        {value || 'Select date'}
+      </span>
+    </button>
+  );
+
   return (
     <>
-      <div className="divide-y divide-gray-100 mb-16 md:mb-0 h-[60vh] md:h-auto overflow-y-auto">
+      <div className="divide-y divide-gray-100 mb-16 md:mb-0 h-[60vh] md:h-auto overflow-y-auto z-[50]">
         {/* Today's Expenses */}
         {groupedExpenses.today.length > 0 && (
           <div className="py-1">
@@ -443,6 +472,18 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <div style={datePickerWrapperStyles}>
+        <DatePicker
+          selected={dateFilter}
+          onChange={(date) => setDateFilter(date)}
+          customInput={<CustomDatePickerInput />}
+          dateFormat="MMM dd, yyyy"
+          placeholderText="Select date"
+          isClearable
+          showPopperArrow={false}
+        />
+      </div>
     </>
   );
 }
