@@ -3,12 +3,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Camera, Upload, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -132,6 +128,18 @@ export function CreateExpenseDialog({
     }
   };
 
+  const CustomDateInput = ({ value, onClick }) => (
+    <Button 
+      variant="outline" 
+      className="w-full justify-center py-5"
+      onClick={onClick}
+      type="button"
+    >
+      <CalendarIcon className="mr-2 h-4 w-4" />
+      {value}
+    </Button>
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[350px] p-0 rounded-lg">
@@ -195,37 +203,16 @@ export function CreateExpenseDialog({
 
               {/* Date Picker */}
               <div className="w-full max-w-[280px]">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-center py-5"
-                      type="button"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {format(formData.expense_date, "MMMM d, yyyy")}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent 
-                    className="w-auto p-0" 
-                    align="center"
-                    position="fixed"
-                    side="bottom"
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={formData.expense_date}
-                      onSelect={(date) =>
-                        setFormData({
-                          ...formData,
-                          expense_date: date || new Date(),
-                        })
-                      }
-                      initialFocus
-                      className="rounded-md border"
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  selected={formData.expense_date}
+                  onChange={(date) => setFormData({
+                    ...formData,
+                    expense_date: date || new Date(),
+                  })}
+                  customInput={<CustomDateInput />}
+                  dateFormat="MMMM d, yyyy"
+                  isClearable={false}
+                />
               </div>
 
               {/* Notes */}
