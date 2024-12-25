@@ -532,11 +532,11 @@ export default function ExpensesPage() {
         {/* Receipt Upload Dialog */}
         {showReceiptDialog && !showCameraView && (
           <div
-            className="fixed inset-0 bg-black/70 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/70 flex items-center justify-center z-[99999] p-4"
             onClick={() => setShowReceiptDialog(false)}
           >
             <div
-              className="bg-white rounded-3xl w-full max-w-sm mx-4 relative"
+              className="bg-white rounded-3xl w-full max-w-sm mx-4 relative z-[99999]"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
