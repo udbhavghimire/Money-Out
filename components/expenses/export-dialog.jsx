@@ -122,13 +122,10 @@ export function ExportDialog({ open, onOpenChange, expenses, categories }) {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent 
+                    className="w-auto p-0" 
                     align="center"
+                    position="fixed"
                     side="bottom"
-                    sideOffset={4}
-                    className="w-[280px] p-0"
-                    avoidCollisions={false}
-                    sticky="always"
-                    portal={true}
                   >
                     <Calendar
                       mode="single"
@@ -159,13 +156,10 @@ export function ExportDialog({ open, onOpenChange, expenses, categories }) {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent 
+                    className="w-auto p-0" 
                     align="center"
+                    position="fixed"
                     side="bottom"
-                    sideOffset={4}
-                    className="w-[280px] p-0"
-                    avoidCollisions={false}
-                    sticky="always"
-                    portal={true}
                   >
                     <Calendar
                       mode="single"
