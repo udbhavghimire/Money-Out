@@ -473,17 +473,6 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <div style={datePickerWrapperStyles}>
-        <DatePicker
-          selected={dateFilter}
-          onChange={(date) => setDateFilter(date)}
-          customInput={<CustomDatePickerInput />}
-          dateFormat="MMM dd, yyyy"
-          placeholderText="Select date"
-          isClearable
-          showPopperArrow={false}
-        />
-      </div>
     </>
   );
 }
