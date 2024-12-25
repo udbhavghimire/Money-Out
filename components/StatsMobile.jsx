@@ -13,6 +13,14 @@ export function StatsMobile({
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
+  const getSelectedCategoryName = () => {
+    if (selectedCategoryFilter === "all") return "";
+    const selectedCategory = categories.find(
+      category => category.id.toString() === selectedCategoryFilter
+    );
+    return selectedCategory ? selectedCategory.name : "All Expenses";
+  };
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -33,51 +41,56 @@ export function StatsMobile({
         <div className="flex items-center justify-between gap-2">
           {/* Stats with Dropdown Section */}
           <div className="relative flex items-center z-[110]" ref={dropdownRef}>
-            <div className="flex items-center gap-6 bg-[#fff6d3] shadow-sm rounded-3xl pl-3 pr-4 py-3">
-              <div className="text-center">
-                <p className="text-[10px] font-medium text-gray-900">
-                  $
-                  {(summary.stats?.week || 0).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-                <p className="text-[8px] uppercase font-bold text-black mt-0.5">
-                  THIS WEEK
-                </p>
+            <div className="flex flex-col bg-[#fff6d3] shadow-sm rounded-3xl pl-3 pr-4 py-3">
+              <p className="text-[10px] font-bold  mb-2 text-blue-600">
+                {getSelectedCategoryName()}
+              </p>
+              <div className="flex items-center gap-6">
+                <div className="text-center">
+                  <p className="text-[10px] font-medium text-gray-900">
+                    $
+                    {(summary.stats?.week || 0).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                  <p className="text-[8px] uppercase font-bold text-black mt-0.5">
+                    THIS WEEK
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] font-medium text-gray-900">
+                    $
+                    {(summary.stats?.month || 0).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                  <p className="text-[8px] uppercase font-bold text-black mt-0.5">
+                    THIS MONTH
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] font-medium text-gray-900">
+                    $
+                    {(summary.stats?.year || 0).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                  <p className="text-[8px] uppercase font-bold text-black mt-0.5">
+                    THIS YEAR
+                  </p>
+                </div>
+                
+                {/* Category Dropdown Trigger */}
+                <button
+                  onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                  className="ml-2"
+                >
+                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                </button>
               </div>
-              <div className="text-center">
-                <p className="text-[10px] font-medium text-gray-900">
-                  $
-                  {(summary.stats?.month || 0).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-                <p className="text-[8px] uppercase font-bold text-black mt-0.5">
-                  THIS MONTH
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-[10px] font-medium text-gray-900">
-                  $
-                  {(summary.stats?.year || 0).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-                <p className="text-[8px] uppercase font-bold text-black mt-0.5">
-                  THIS YEAR
-                </p>
-              </div>
-              
-              {/* Category Dropdown Trigger */}
-              <button
-                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                className="ml-2"
-              >
-                <ChevronDown className="h-4 w-4 text-gray-500" />
-              </button>
             </div>
 
             
