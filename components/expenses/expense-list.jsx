@@ -345,7 +345,7 @@ export function ExpenseList({ expenses, onExpenseUpdated, categories }) {
 
   return (
     <>
-      <div className="divide-y divide-gray-100 mb-16 md:mb-0 h-[60vh] md:h-auto overflow-y-auto z-[50]">
+      <div className="divide-y divide-gray-100 mb-16 md:mb-0 h-[calc(100vh-220px)] md:h-auto overflow-y-auto">
         {/* Today's Expenses */}
         {groupedExpenses.today.length > 0 && (
           <div className="py-1">

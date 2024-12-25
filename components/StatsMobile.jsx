@@ -28,7 +28,7 @@ export function StatsMobile({
   return (
     <div className="md:hidden">
       {/* Stats and Filter Section */}
-      <div className="sticky top-0 z-[50] p-5">
+      <div className="sticky top-0 z-[100] p-5">
         <div className="flex items-center justify-between gap-2">
           {/* Stats with Dropdown Section */}
           <div className="relative flex items-center z-[110]" ref={dropdownRef}>

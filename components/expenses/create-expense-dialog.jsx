@@ -203,33 +203,27 @@ export function CreateExpenseDialog({
                       type="button"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {format(formData.expense_date, "dd MMMM, yyyy")}
+                      {format(formData.expense_date, "MMMM d, yyyy")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent 
                     className="w-auto p-0" 
                     align="center"
-                    sideOffset={5}
-                    onInteractOutside={(e) => {
-                      e.preventDefault();
-                    }}
+                    position="fixed"
+                    side="bottom"
                   >
-                    <div className="bg-white rounded-lg shadow-lg border">
-                      <Calendar
-                        mode="single"
-                        selected={formData.expense_date}
-                        onSelect={(date) =>
-                          setFormData({
-                            ...formData,
-                            expense_date: date || new Date(),
-                          })
-                        }
-                        initialFocus
-                        disabled={false}
-                        className="rounded-md"
-                        closeOnSelect={true}
-                      />
-                    </div>
+                    <Calendar
+                      mode="single"
+                      selected={formData.expense_date}
+                      onSelect={(date) =>
+                        setFormData({
+                          ...formData,
+                          expense_date: date || new Date(),
+                        })
+                      }
+                      initialFocus
+                      className="rounded-md border"
+                    />
                   </PopoverContent>
                 </Popover>
               </div>
