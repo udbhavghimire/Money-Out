@@ -17,6 +17,24 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+const CustomDateInput = React.forwardRef(({ value, onClick, placeholder }, ref) => (
+  <Button
+    type="button"
+    variant="outline"
+    className={cn(
+      "w-full justify-start text-left font-normal",
+      !value && "text-muted-foreground"
+    )}
+    onClick={onClick}
+    ref={ref}
+  >
+    <CalendarIcon className="mr-2 h-4 w-4" />
+    {value || <span>{placeholder}</span>}
+  </Button>
+));
 
 export function ExportDialog({ open, onOpenChange, expenses, categories }) {
   const [loading, setLoading] = useState(false);
@@ -104,73 +122,27 @@ export function ExportDialog({ open, onOpenChange, expenses, categories }) {
             <div className="w-full space-y-2">
               <label className="text-sm font-medium">Date Range (Optional)</label>
               <div className="flex gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !dateRange.from && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateRange.from ? (
-                        format(dateRange.from, "MMM dd, yyyy")
-                      ) : (
-                        <span>Start date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent 
-                    className="w-auto p-0" 
-                    align="center"
-                    position="fixed"
-                    side="bottom"
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={dateRange.from}
-                      onSelect={(date) =>
-                        setDateRange((prev) => ({ ...prev, from: date }))
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !dateRange.to && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateRange.to ? (
-                        format(dateRange.to, "MMM dd, yyyy")
-                      ) : (
-                        <span>End date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent 
-                    className="w-auto p-0" 
-                    align="center"
-                    position="fixed"
-                    side="bottom"
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={dateRange.to}
-                      onSelect={(date) =>
-                        setDateRange((prev) => ({ ...prev, to: date }))
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="flex-1">
+                  <DatePicker
+                    selected={dateRange.from}
+                    onChange={(date) => setDateRange(prev => ({ ...prev, from: date }))}
+                    customInput={<CustomDateInput placeholder="Start date" />}
+                    dateFormat="MMM dd, yyyy"
+                    placeholderText="Start date"
+                    isClearable
+                  />
+                </div>
+                <div className="flex-1">
+                  <DatePicker
+                    selected={dateRange.to}
+                    onChange={(date) => setDateRange(prev => ({ ...prev, to: date }))}
+                    customInput={<CustomDateInput placeholder="End date" />}
+                    dateFormat="MMM dd, yyyy"
+                    placeholderText="End date"
+                    isClearable
+                    minDate={dateRange.from}
+                  />
+                </div>
               </div>
             </div>
 
