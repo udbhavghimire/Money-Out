@@ -64,8 +64,10 @@ export function CameraCapture({ onCapture, onClose }) {
     setCapturedImage(canvas.toDataURL('image/jpeg'));
   };
 
-  const handleRetake = () => {
-    setCapturedImage(null); // Clear the captured image to show camera view again
+  const handleRetake = async () => {
+    setCapturedImage(null); // Clear the captured image
+    // Restart the camera stream
+    await startCamera();
   };
 
   const handleUpload = () => {
@@ -85,6 +87,13 @@ export function CameraCapture({ onCapture, onClose }) {
 
   const startCamera = async () => {
     try {
+      // Stop any existing stream first
+      if (stream) {
+        stream.getTracks().forEach(track => {
+          track.stop();
+        });
+      }
+
       // Request camera permissions explicitly first
       const constraints = {
         video: {
