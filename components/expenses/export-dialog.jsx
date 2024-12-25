@@ -88,7 +88,7 @@ export function ExportDialog({ open, onOpenChange, expenses, categories }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[320px] rounded-2xl">
+      <DialogContent className="max-w-[340px] rounded-2xl sm:max-w-[400px]">
         <DialogHeader>
           <DialogTitle className="text-center">Export Expenses</DialogTitle>
         </DialogHeader>
@@ -121,7 +121,14 @@ export function ExportDialog({ open, onOpenChange, expenses, categories }) {
                       )}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent 
+                
+                    align="start"
+                    side="bottom"
+                    sideOffset={4}
+                    alignOffset={0}
+                    className="w-[280px] p-0"
+                  >
                     <Calendar
                       mode="single"
                       selected={dateRange.from}
@@ -150,7 +157,14 @@ export function ExportDialog({ open, onOpenChange, expenses, categories }) {
                       )}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent 
+               
+                    align="start"
+                    side="bottom"
+                    sideOffset={4}
+                    alignOffset={0}
+                    className="w-[280px] p-0"
+                  >
                     <Calendar
                       mode="single"
                       selected={dateRange.to}
