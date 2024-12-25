@@ -467,6 +467,14 @@ export default function ExpensesPage() {
             <div className="md:block hidden">
               <h2 className="text-blue-600 text-base font-semibold mb-2">
                 EXPENSE HISTORY
+                {activeFilters.categories?.length > 0
+                  ? ` - ${categories
+                      .filter((cat) =>
+                        activeFilters.categories.includes(cat.id.toString())
+                      )
+                      .map((cat) => cat.name)
+                      .join(" & ")}`
+                  : ""}
               </h2>
             </div>
 
