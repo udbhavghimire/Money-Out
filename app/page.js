@@ -42,6 +42,10 @@ import { ExportDialog } from "@/components/expenses/export-dialog";
 import { StatsMobile } from "@/components/StatsMobile";
 import { SearchMobile } from "@/components/SearchMobile";
 import SelectedFilter from "@/components/SelectedFilter";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { LogoutButton } from "@/components/LogoutButton";
+import { ActivityLogDialog } from "@/components/ActivityLogDialog";
+
 export default function ExpensesPage() {
   const router = useRouter();
   const [expenses, setExpenses] = useState([]);
@@ -79,6 +83,7 @@ export default function ExpensesPage() {
   const [showFullImage, setShowFullImage] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
+  const [showActivityLog, setShowActivityLog] = useState(false);
 
   useEffect(() => {
     // Redirect to signin if not authenticated
@@ -182,6 +187,18 @@ export default function ExpensesPage() {
     setSelectedFile(null);
   };
 
+  const logActivity = async (type, details, amount = null) => {
+    try {
+      await axios.post("/api/activities", {
+        type,
+        details,
+        amount,
+      });
+    } catch (error) {
+      console.error("Failed to log activity:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -224,6 +241,13 @@ export default function ExpensesPage() {
       // Refresh data
       fetchExpenses();
       fetchSummary();
+
+      // Log the activity
+      await logActivity(
+        "CREATE_EXPENSE",
+        `Created expense: ${formData.description}`,
+        parseFloat(formData.amount)
+      );
     } catch (error) {
       toast({
         variant: "destructive",
@@ -275,6 +299,11 @@ export default function ExpensesPage() {
     };
   };
 
+  const handleLogout = () => {
+    // Add your logout logic here
+    router.push("/signin");
+  };
+
   return (
     <div className="min-h-screen overflow-x-hidden">
       {/* Background Container */}
@@ -296,7 +325,7 @@ export default function ExpensesPage() {
       {!showCameraView && (
         <>
           <div className="p-5 px-6 block md:hidden">
-            <div className="">
+            <div className="flex justify-between items-center">
               <Image
                 src="/money-out-logo.png"
                 alt="Money Out"
@@ -304,6 +333,25 @@ export default function ExpensesPage() {
                 height={22}
                 className=""
               />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9">
+                    <Settings className="h-5 w-5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-0" align="end">
+                  <div className="flex flex-col">
+                    <Button
+                      variant="ghost"
+                      className="justify-start h-12 px-4 hover:bg-gray-100"
+                      onClick={() => setShowActivityLog(true)}
+                    >
+                      Activity Log
+                    </Button>
+                    <LogoutButton />
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <StatsMobile
@@ -353,10 +401,26 @@ export default function ExpensesPage() {
               className="object-contain"
             />
             <div className="flex items-center gap-4">
-              <Button variant="outline" className="rounded-full">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="rounded-full">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-0" align="end">
+                  <div className="flex flex-col">
+                    <Button
+                      variant="ghost"
+                      className="justify-start h-12 px-4 hover:bg-gray-100"
+                      onClick={() => setShowActivityLog(true)}
+                    >
+                      Activity Log
+                    </Button>
+                    <LogoutButton />
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
@@ -761,6 +825,11 @@ export default function ExpensesPage() {
           onOpenChange={setShowExportDialog}
           expenses={filteredExpenses}
           categories={categories}
+        />
+
+        <ActivityLogDialog
+          open={showActivityLog}
+          onOpenChange={setShowActivityLog}
         />
       </div>
     </div>

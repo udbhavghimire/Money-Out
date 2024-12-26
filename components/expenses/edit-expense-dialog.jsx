@@ -118,13 +118,18 @@ export function EditExpenseDialog({
 
     try {
       const submitData = new FormData();
-      Object.keys(formData).forEach((key) => {
+      const updatedFormData = {
+        ...formData,
+        title: formData.description
+      };
+
+      Object.keys(updatedFormData).forEach((key) => {
         if (key === "expense_date") {
-          submitData.append(key, format(formData[key], "yyyy-MM-dd"));
+          submitData.append(key, format(updatedFormData[key], "yyyy-MM-dd"));
         } else if (key === "amount" || key === "hst") {
-          submitData.append(key, parseFloat(formData[key] || 0));
+          submitData.append(key, parseFloat(updatedFormData[key] || 0));
         } else {
-          submitData.append(key, formData[key]);
+          submitData.append(key, updatedFormData[key]);
         }
       });
 
@@ -138,9 +143,7 @@ export function EditExpenseDialog({
         },
       });
 
-      if (response.data.receipt) {
-        expense.receipt = response.data.receipt;
-      }
+      Object.assign(expense, response.data);
 
       toast({
         title: "Success",

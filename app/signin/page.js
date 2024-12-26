@@ -38,12 +38,7 @@ export default function SignIn() {
         password: formData.get("password"),
       };
 
-      console.log("Attempting login with:", {
-        username: credentials.username,
-        passwordLength: credentials.password?.length,
-      });
-
-      await signIn(credentials);
+      const response = await signIn(credentials);
 
       toast({
         title: "Success",
