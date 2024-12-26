@@ -20,11 +20,15 @@ export function ActivityLogDialog({ open, onOpenChange }) {
     try {
       setLoading(true);
       const response = await axios.get("https://admin.sixdesign.ca/api/expenses/my-activity/");
-      setActivities(response.data);
+      const activityData = Array.isArray(response.data) ? response.data : response.data.activities || [];
+      setActivities(activityData);
       setError(null);
+      
+      console.log('Activity Response:', response.data);
     } catch (error) {
       setError("Failed to load activity log");
       console.error("Error fetching activities:", error);
+      setActivities([]);
     } finally {
       setLoading(false);
     }
@@ -74,15 +78,15 @@ export function ActivityLogDialog({ open, onOpenChange }) {
             </div>
           ) : error ? (
             <div className="text-center py-8 text-red-500">{error}</div>
-          ) : activities.length === 0 ? (
+          ) : !Array.isArray(activities) || activities.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               No activities found
             </div>
           ) : (
             <div className="space-y-4">
-              {activities.map((activity) => (
+              {activities.map((activity, index) => (
                 <div
-                  key={activity.id}
+                  key={activity.id || index}
                   className="flex items-start gap-4 p-3 rounded-lg hover:bg-gray-50"
                 >
                   <div className="mt-1">{getActivityIcon(activity.type)}</div>
