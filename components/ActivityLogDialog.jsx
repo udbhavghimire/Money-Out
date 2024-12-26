@@ -19,7 +19,7 @@ export function ActivityLogDialog({ open, onOpenChange }) {
   const fetchActivities = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/activities");
+      const response = await axios.get("https://admin.sixdesign.ca/api/expenses/my-activity/");
       setActivities(response.data);
       setError(null);
     } catch (error) {
@@ -37,14 +37,24 @@ export function ActivityLogDialog({ open, onOpenChange }) {
       case "LOGOUT":
         return <LogOut className="h-4 w-4 text-gray-500" />;
       case "CREATE_EXPENSE":
+      case "EXPENSE_CREATED":
         return <Receipt className="h-4 w-4 text-blue-500" />;
       case "EDIT_EXPENSE":
+      case "EXPENSE_UPDATED":
         return <Edit className="h-4 w-4 text-orange-500" />;
       case "DELETE_EXPENSE":
+      case "EXPENSE_DELETED":
         return <Trash2 className="h-4 w-4 text-red-500" />;
       default:
         return <Activity className="h-4 w-4 text-gray-500" />;
     }
+  };
+
+  const formatActivityMessage = (activity) => {
+    if (!activity.message) {
+      return activity.details || "Unknown activity";
+    }
+    return activity.message;
   };
 
   return (
@@ -78,15 +88,15 @@ export function ActivityLogDialog({ open, onOpenChange }) {
                   <div className="mt-1">{getActivityIcon(activity.type)}</div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">
-                      {activity.details}
+                      {formatActivityMessage(activity)}
                     </p>
                     {activity.amount && (
                       <p className="text-sm text-gray-500">
-                        Amount: ${activity.amount.toFixed(2)}
+                        Amount: ${parseFloat(activity.amount).toFixed(2)}
                       </p>
                     )}
                     <p className="text-xs text-gray-500 mt-1">
-                      {format(new Date(activity.timestamp), "MMM d, yyyy 'at' h:mm a")}
+                      {format(new Date(activity.created_at || activity.timestamp), "MMM d, yyyy 'at' h:mm a")}
                     </p>
                   </div>
                 </div>
