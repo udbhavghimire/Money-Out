@@ -54,18 +54,16 @@ export function ActivityLogDialog({ open, onOpenChange }) {
   };
 
   const formatActivityMessage = (activity) => {
-    const actionText = activity.action_display;
-    const expenseTitle = activity.expense_title;
-    const amount = activity.expense_amount;
-
-    if (activity.changes) {
-      const changeDescriptions = activity.changes.map(change => 
-        `${change.field} from "${change.old_value}" to "${change.new_value}"`
-      ).join(", ");
-      return `${actionText} expense "${expenseTitle}" (${changeDescriptions})`;
+    switch (activity.action) {
+      case 'CREATE':
+        return 'Created Expense -';
+      case 'UPDATE':
+        return 'Edited Expense -';
+      case 'DELETE':
+        return 'Deleted Expense -';
+      default:
+        return 'Modified Expense -';
     }
-
-    return `${actionText} expense "${expenseTitle}"`;
   };
 
   const groupActivitiesByDate = (activities) => {
@@ -84,7 +82,7 @@ export function ActivityLogDialog({ open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-[350px] rounded-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
@@ -114,19 +112,28 @@ export function ActivityLogDialog({ open, onOpenChange }) {
                     {dateActivities.map((activity) => (
                       <div
                         key={activity.id}
-                        className="flex items-start gap-4 p-3 rounded-lg hover:bg-gray-50 border border-gray-100"
+                        className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 border border-gray-100"
                       >
-                        <div className="mt-1">{getActivityIcon(activity.action)}</div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">
-                            {formatActivityMessage(activity)}
+                        <div className="mt-0.5">{getActivityIcon(activity.action)}</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-gray-900">
+                            <span className="text-gray-500">{formatActivityMessage(activity)}</span>
+                            {" "}
+                            {activity.expense_title}
                           </p>
-                          <p className="text-sm text-gray-500">
-                            Amount: ${parseFloat(activity.expense_amount).toFixed(2)}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-[11px] text-gray-400">
                             {format(new Date(activity.timestamp), "h:mm a")}
                           </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs font-medium text-gray-900">
+                            ${Number(activity.expense_amount || 0).toFixed(2)}
+                          </p>
+                          {activity.category_name && (
+                            <p className="text-[11px] text-gray-500">
+                              {activity.category_name}
+                            </p>
+                          )}
                         </div>
                       </div>
                     ))}
