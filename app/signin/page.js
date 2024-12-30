@@ -12,7 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { signIn, isAuthenticated } from "@/lib/auth";
+import { signIn, isAuthenticated, setAuth } from "@/lib/auth";
+import Link from "next/link";
 
 export default function SignIn() {
   const router = useRouter();
@@ -33,12 +34,20 @@ export default function SignIn() {
 
     try {
       const formData = new FormData(event.currentTarget);
-      const credentials = {
-        username: formData.get("username"),
-        password: formData.get("password"),
-      };
+      const username = formData.get("username");
+      const password = formData.get("password");
 
-      const response = await signIn(credentials);
+      const response = await signIn({
+        username: username,
+        password: password,
+      });
+
+      console.log("Login response:", response);
+
+      setAuth(response.token, {
+        username: username,
+        email: response.email,
+      });
 
       toast({
         title: "Success",
@@ -77,6 +86,7 @@ export default function SignIn() {
                 name="username"
                 type="text"
                 placeholder="Username or Email"
+                className="h-10 text-base px-4"
                 required
               />
             </div>
@@ -86,6 +96,7 @@ export default function SignIn() {
                 name="password"
                 type="password"
                 placeholder="Password"
+                className="h-10 text-base px-4"
                 required
               />
             </div>
@@ -93,6 +104,12 @@ export default function SignIn() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
+            <div className="text-center text-sm text-gray-500">
+              Don't have an account?{" "}
+              <Link href="/signup" className="text-blue-600 hover:underline">
+                Sign up here
+              </Link>
+            </div>
           </form>
         </CardContent>
       </Card>

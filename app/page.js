@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/lib/auth";
+import { isAuthenticated, getUser } from "@/lib/auth";
 import { CreateExpenseDialog } from "@/components/expenses/create-expense-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,11 +84,19 @@ export default function ExpensesPage() {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
   const [showActivityLog, setShowActivityLog] = useState(false);
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
     // Redirect to signin if not authenticated
     if (!isAuthenticated()) {
       router.push("/signin");
+    } else {
+      const user = getUser();
+      console.log("User data from storage:", user);
+      if (user) {
+        setUsername(user.username);
+        console.log("Setting username to:", user.username);
+      }
     }
   }, [router]);
 
@@ -101,7 +109,12 @@ export default function ExpensesPage() {
   const fetchExpenses = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/expenses/");
+      const user = getUser();
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const response = await axios.get(`/expenses/?user=${user.username}`);
       setExpenses(response.data);
     } catch (error) {
       toast({
@@ -116,7 +129,12 @@ export default function ExpensesPage() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("/api/categories/");
+      const user = getUser();
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const response = await axios.get(`/categories/?user=${user.username}`);
       console.log("Fetched categories:", response.data);
       setCategories(response.data);
     } catch (error) {
@@ -126,7 +144,14 @@ export default function ExpensesPage() {
 
   const fetchSummary = async () => {
     try {
-      const response = await axios.get("/api/expenses/summary/");
+      const user = getUser();
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const response = await axios.get(
+        `/expenses/summary/?user=${user.username}`
+      );
       setSummary(response.data);
     } catch (error) {
       console.error("Failed to fetch summary:", error);
@@ -326,13 +351,15 @@ export default function ExpensesPage() {
         <>
           <div className="p-5 px-6 block md:hidden">
             <div className="flex justify-between items-center">
-              <Image
-                src="/money-out-logo.png"
-                alt="Money Out"
-                width={70}
-                height={22}
-                className=""
-              />
+              <div className="flex flex-col">
+                <Image
+                  src="/money-out-logo.png"
+                  alt="Money Out"
+                  width={70}
+                  height={22}
+                  className=""
+                />
+              </div>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-9 w-9">
@@ -354,6 +381,16 @@ export default function ExpensesPage() {
               </Popover>
             </div>
           </div>
+
+          {/* Mobile Welcome Message */}
+          <div className="px-6 mt-4 md:hidden block">
+            {" "}
+            <span className="text-md text-black mt-1 font-bold mt-5">
+              Welcome,{" "}
+              <span className="text-blue-600"> {username || "User"}</span>
+            </span>
+          </div>
+
           <StatsMobile
             summary={{
               stats: getFilteredStats(),
@@ -393,13 +430,15 @@ export default function ExpensesPage() {
         {/* Desktop Header */}
         <div className="hidden md:block w-full bg-white border-b">
           <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <Image
-              src="/money-out-logo.png"
-              alt="Money Out"
-              width={100}
-              height={32}
-              className="object-contain"
-            />
+            <div className="flex flex-col">
+              <Image
+                src="/money-out-logo.png"
+                alt="Money Out"
+                width={100}
+                height={32}
+                className="object-contain"
+              />
+            </div>
             <div className="flex items-center gap-4">
               <Popover>
                 <PopoverTrigger asChild>
@@ -427,6 +466,15 @@ export default function ExpensesPage() {
 
         {/* Desktop Layout Container */}
         <div className="md:max-w-7xl md:mx-auto md:px-6 md:py-8">
+          {/* Desktop Welcome Message */}
+          <div className="px-6 my-4 hidden md:block">
+            {" "}
+            <span className="text-md md:text-xl text-black mt-1 font-bold mt-5">
+              Welcome,{" "}
+              <span className="text-blue-600"> {username || "User"}</span>
+            </span>
+          </div>
+
           {/* Main Content Area - Combined Stats, Filters, and Expenses */}
           <div className="md:bg-white md:rounded-2xl md:p-6 md:shadow-sm">
             {/* Stats and Filters Section */}
