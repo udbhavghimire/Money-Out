@@ -73,7 +73,7 @@ export default function SignIn() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-[350px]">
         <CardHeader className="text-center">
-          <CardTitle>Sign In</CardTitle>
+          <CardTitle className="text-3xl">Sign In</CardTitle>
           <CardDescription>
             Enter your credentials to access your account
           </CardDescription>
@@ -86,7 +86,7 @@ export default function SignIn() {
                 name="username"
                 type="text"
                 placeholder="Username or Email"
-                className="h-10 text-base px-4 text-center"
+                className="h-10 text-base px-4 "
                 required
               />
             </div>
@@ -96,7 +96,7 @@ export default function SignIn() {
                 name="password"
                 type="password"
                 placeholder="Password"
-                className="h-10 text-base px-4 text-center"
+                className="h-10 text-base px-4"
                 required
               />
             </div>
