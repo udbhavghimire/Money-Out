@@ -33,6 +33,7 @@ const steps = [
     description: "Set your account password",
   },
 ];
+
 export default function SignUp() {
   const router = useRouter();
   const { toast } = useToast();
