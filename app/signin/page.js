@@ -72,7 +72,7 @@ export default function SignIn() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-[350px]">
-        <CardHeader>
+        <CardHeader className="text-center">
           <CardTitle>Sign In</CardTitle>
           <CardDescription>
             Enter your credentials to access your account
@@ -86,7 +86,7 @@ export default function SignIn() {
                 name="username"
                 type="text"
                 placeholder="Username or Email"
-                className="h-10 text-base px-4"
+                className="h-10 text-base px-4 text-center"
                 required
               />
             </div>
@@ -96,11 +96,15 @@ export default function SignIn() {
                 name="password"
                 type="password"
                 placeholder="Password"
-                className="h-10 text-base px-4"
+                className="h-10 text-base px-4 text-center"
                 required
               />
             </div>
-            {error && <div className="text-sm text-red-500 mt-2">{error}</div>}
+            {error && (
+              <div className="text-sm text-red-500 mt-2 text-center">
+                {error}
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
