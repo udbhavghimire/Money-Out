@@ -114,7 +114,7 @@ export default function ExpensesPage() {
         throw new Error("User not found");
       }
 
-      const response = await axios.get(`/expenses/?user=${user.username}`);
+      const response = await axios.get(`/api/expenses/?user=${user.username}`);
       setExpenses(response.data);
     } catch (error) {
       toast({
@@ -134,8 +134,9 @@ export default function ExpensesPage() {
         throw new Error("User not found");
       }
 
-      const response = await axios.get(`/categories/?user=${user.username}`);
-      console.log("Fetched categories:", response.data);
+      const response = await axios.get(
+        `/api/categories/?user=${user.username}`
+      );
       setCategories(response.data);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
@@ -150,7 +151,7 @@ export default function ExpensesPage() {
       }
 
       const response = await axios.get(
-        `/expenses/summary/?user=${user.username}`
+        `/api/expenses/summary/?user=${user.username}`
       );
       setSummary(response.data);
     } catch (error) {
@@ -229,6 +230,11 @@ export default function ExpensesPage() {
     setLoading(true);
 
     try {
+      const user = getUser();
+      if (!user) {
+        throw new Error("User not found");
+      }
+
       const submitData = new FormData();
       submitData.append("title", formData.description);
       submitData.append("amount", parseFloat(formData.amount));
@@ -238,6 +244,7 @@ export default function ExpensesPage() {
         "expense_date",
         format(formData.expense_date, "yyyy-MM-dd")
       );
+      submitData.append("user", user.username);
 
       if (selectedFile) {
         submitData.append("receipt", selectedFile);
@@ -274,6 +281,7 @@ export default function ExpensesPage() {
         parseFloat(formData.amount)
       );
     } catch (error) {
+      console.error("Error creating expense:", error);
       toast({
         variant: "destructive",
         title: "Error",
