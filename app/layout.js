@@ -21,6 +21,11 @@ export default function RootLayout({ children }) {
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1"
         />
+        <meta
+          name="keywords"
+          content="personal finance, budgeting, financial planning, money management, expense tracking, income management"
+        ></meta>
+        <link rel="icon" href="/favicon.ico" />
       </head>
       <body className="relative min-h-screen bg-white">
         <AuthProvider>
