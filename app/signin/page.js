@@ -57,7 +57,10 @@ export default function SignIn() {
       router.push("/");
     } catch (error) {
       console.error("Login error:", error);
-      const errorMessage = error.message || "Invalid credentials";
+      let errorMessage = "Incorrect password!";
+      if (error.response?.status !== 401) {
+        errorMessage = "An error occurred during sign in";
+      }
       setError(errorMessage);
       toast({
         variant: "destructive",
